@@ -14,4 +14,8 @@ config SMENT_PID
 	int "SpaceMouse Enterprice product ID"
 	default 0xc633
 
+config RECORD_SHOW_TIMESTAMP
+	bool "Prefix record message with timestamp"
+	default n
+
 endmenu # Runtime defaults

@@ -3,6 +3,7 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
+#include <assert.h>
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -79,6 +80,7 @@ void log_printf(FILE *stream, const char *prefix, const char *hint,
 void __log_record(const char *func, const char *fmt, ...)
 {
 	int err;
+	int nw = 0;
 	va_list ap;
 	char prefix[SZ_512];
 	struct timespec tp;
@@ -89,10 +91,17 @@ void __log_record(const char *func, const char *fmt, ...)
 		tp.tv_nsec = 39;
 	}
 
-	snprintf(prefix, sizeof(prefix),
-		 H("[%" PRIu64 ".%" PRIu64 "] ", SGR_BOLD, SGR_GREEN)
-		 H("%s():", SGR_WHITE),
-		 (uint64_t)tp.tv_sec, (uint64_t)tp.tv_nsec / 1000, func);
+	if (IS_ENABLED(CONFIG_RECORD_SHOW_TIMESTAMP)) {
+		nw = snprintf(prefix, sizeof(prefix),
+			      H("[%" PRIu64 ".%" PRIu64 "] ",
+				SGR_BOLD, SGR_GREEN),
+			      (uint64_t)tp.tv_sec, (uint64_t)tp.tv_nsec / 1000);
+		assert(nw > 0);
+	}
+
+	nw = snprintf(&prefix[nw], sizeof(prefix) - nw, H("%s():", SGR_WHITE),
+		      func);
+	assert(nw > 0);
 
 	va_start(ap, fmt);
 	log_vwritef(STDOUT_FILENO, prefix, NULL, fmt, ap);
