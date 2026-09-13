@@ -5,9 +5,9 @@ build/daemon/%/entry: $(lib-obj-y) $(daemon-obj-y) \
 		      build/libdeflate.a
 	mkdir -p $(@D)
 	$(CC) $(LDFLAGS) \
-	      $(DAEMON_LDFLAGS) \
 	      $(filter %.o,$^) \
 	      $(filter %.a,$^) \
+	      $(DAEMON_LDFLAGS) \
 	      -o $@
 
 build/libusb.a: libusb/libusb-1.0.a
