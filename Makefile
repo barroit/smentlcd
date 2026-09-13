@@ -65,10 +65,12 @@ lib-obj-y += build/lib/atexit.o \
 	     build/lib/unicode_width.o \
 	     build/lib/xalloc.o
 
-daemon-obj-y += build/lib/device.o
+daemon-obj-y += build/lib/device.o \
+		build/lib/log_nb.o
 
 ifneq ($(ON_LINUX),)
-  daemon-obj-y += build/systemd/ipc.o
+  daemon-obj-y += build/systemd/ipc.o \
+		  build/systemd/log_nb.o
 else ifneq ($(ON_MACOS),)
   daemon-obj-y += build/launchd/ipc.o
 endif

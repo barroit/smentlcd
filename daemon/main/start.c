@@ -50,5 +50,5 @@ int cmd_main_start(int argc, const char **argv)
 	ipc_bind_exec_req(ipc_ctx, exec_req);
 	ipc_listen(ipc_ctx);
 
-	abort();
+	return 0;
 }

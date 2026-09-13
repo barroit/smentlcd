@@ -24,6 +24,9 @@ struct event_source {
 struct dev_ctx {
 	struct ipc_ctx *ipc_ctx;
 	struct list_head ev_src_list;
+
+	struct libusb_device *dev;
+	struct libusb_device_descriptor dd;
 };
 
 void dev_init(struct dev_ctx **__ctx)
@@ -95,17 +98,26 @@ static int handle_hotplug(struct libusb_context *libusb,
 			  struct libusb_device *dev,
 			  libusb_hotplug_event event, void *userdata)
 {
-	int err;
-	struct libusb_device_descriptor dd;
+	struct dev_ctx *ctx = userdata;
 
-	err = libusb_get_device_descriptor(dev, &dd);
-	if (err) {
-		error_libusb(err,
-			     "can't get device descriptor in hotplug handler");
-		return 0;
+	switch (event) {
+	case LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED:
+		ctx->dev = libusb_ref_device(dev);
+		/*
+		 * Since libusb-1.0.16, this function always succeeds.
+		 */
+		libusb_get_device_descriptor(dev, &ctx->dd);
+		record("device %" PRIx16 ":%" PRIx16 " plugged",
+		       ctx->dd.idVendor, ctx->dd.idProduct);
+		break;
+
+	case LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT:
+		libusb_unref_device(ctx->dev);
+		ctx->dev = NULL;
+		record("device %" PRIx16 ":%" PRIx16 " unplugged",
+		       ctx->dd.idVendor, ctx->dd.idProduct);
 	}
 
-	record("%04x:%04x\n", dd.idVendor, dd.idProduct);
 	return 0;
 }
 
@@ -117,7 +129,7 @@ void dev_enable_hotplug(struct dev_ctx *ctx)
 				     LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
 			       LIBUSB_HOTPLUG_ENUMERATE, CONFIG_SMENT_VID,
 			       CONFIG_SMENT_PID, LIBUSB_HOTPLUG_MATCH_ANY,
-			       handle_hotplug, &ctx, NULL);
+			       handle_hotplug, ctx, NULL);
 	if (err)
 		die_libusb(err, "failed to register hotplug event callback");
 }

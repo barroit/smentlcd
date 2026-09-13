@@ -3,6 +3,8 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
+#include "log.h"
+
 #include <assert.h>
 #include <inttypes.h>
 #include <stdint.h>
@@ -10,14 +12,16 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "log.h"
 #include "rio.h"
 #include "sgr.h"
 #include "size.h"
 #include "strbuf.h"
 
-static size_t format_line(char *buf, size_t cap, const char *prefix,
-			  const char *hint, const char *fmt, va_list ap)
+typeof(log_vwritef) *__log_vwritef = log_vwritef;
+typeof(__log_nb_stop) __log_nb_stop;
+
+size_t __log_format_line(char *buf, size_t cap, const char *prefix,
+			 const char *hint, const char *fmt, va_list ap)
 {
 	struct strbuf sb = SB_INIT_PREALLOC(buf, cap - 1);
 
@@ -41,7 +45,7 @@ void log_vwritef(int fd, const char *prefix, const char *hint,
 		 const char *fmt, va_list ap)
 {
 	char buf[SZ_2K];
-	size_t len = format_line(buf, sizeof(buf), prefix, hint, fmt, ap);
+	size_t len = __log_format_line(buf, sizeof(buf), prefix, hint, fmt, ap);
 
 	rwrite(fd, buf, len);
 }
@@ -52,7 +56,7 @@ void log_writef(int fd, const char *prefix, const char *hint,
 	va_list ap;
 
 	va_start(ap, fmt);
-	log_vwritef(fd, prefix, hint, fmt, ap);
+	__log_vwritef(fd, prefix, hint, fmt, ap);
 
 	va_end(ap);
 }
@@ -61,7 +65,7 @@ void log_vprintf(FILE *stream, const char *prefix, const char *hint,
 		 const char *fmt, va_list ap)
 {
 	char buf[SZ_2K];
-	size_t len = format_line(buf, sizeof(buf), prefix, hint, fmt, ap);
+	size_t len = __log_format_line(buf, sizeof(buf), prefix, hint, fmt, ap);
 
 	fwrite(buf, sizeof(*buf), len, stream);
 }
@@ -104,7 +108,7 @@ void __log_record(const char *func, const char *fmt, ...)
 	assert(nw > 0);
 
 	va_start(ap, fmt);
-	log_vwritef(STDOUT_FILENO, prefix, NULL, fmt, ap);
+	__log_vwritef(STDOUT_FILENO, prefix, NULL, fmt, ap);
 
 	va_end(ap);
 }
@@ -114,8 +118,8 @@ int __log_warn(const char *hint, const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	log_vwritef(STDERR_FILENO,
-		    H("warn:", SGR_BOLD, SGR_YELLOW), hint, fmt, ap);
+	__log_vwritef(STDERR_FILENO,
+		      H("warn:", SGR_BOLD, SGR_YELLOW), hint, fmt, ap);
 
 	va_end(ap);
 	return 1;
@@ -126,8 +130,8 @@ int __log_error(const char *hint, const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	log_vwritef(STDERR_FILENO,
-		    H("error:", SGR_BOLD, SGR_RED), hint, fmt, ap);
+	__log_vwritef(STDERR_FILENO,
+		      H("error:", SGR_BOLD, SGR_RED), hint, fmt, ap);
 
 	va_end(ap);
 	return 1;
@@ -138,8 +142,11 @@ void __log_die(const char *hint, const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	log_vwritef(STDERR_FILENO,
-		    H("fatal:", SGR_BOLD, SGR_RED), hint, fmt, ap);
+	__log_vwritef(STDERR_FILENO,
+		      H("fatal:", SGR_BOLD, SGR_RED), hint, fmt, ap);
+
+	if (__log_nb_stop)
+		__log_nb_stop();
 
 	exit(128);
 }
@@ -149,7 +156,7 @@ void __log_bug(const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	log_vwritef(STDERR_FILENO, NULL, NULL, fmt, ap);
+	__log_vwritef(STDERR_FILENO, NULL, NULL, fmt, ap);
 
 	abort();
 }

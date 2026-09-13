@@ -82,6 +82,8 @@ ifeq ($(CONFIG_ENABLE_DEBUG),)
   CFLAGS += -DNDEBUG
 endif
 
+DAEMON_LDFLAGS += -pthread
+
 ifneq ($(ON_LINUX),)
   DAEMON_LDFLAGS += -ludev -lsystemd
 endif

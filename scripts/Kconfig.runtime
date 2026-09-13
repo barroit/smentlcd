@@ -18,4 +18,12 @@ config RECORD_SHOW_TIMESTAMP
 	bool "Prefix record message with timestamp"
 	default n
 
+config LOG_MESSAGE_RING_SIZE
+	int "Message queue size of logging system"
+	default 512
+
+config LOG_MESSAGE_BUFFER_SIZE
+	int "Message buffer size of logging system"
+	default 2048
+
 endmenu # Runtime defaults
