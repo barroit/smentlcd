@@ -70,13 +70,10 @@ daemon-obj-y += build/lib/device.o \
 
 ifneq ($(ON_LINUX),)
   daemon-obj-y += build/systemd/ipc.o \
-		  build/systemd/log_nb.o
+		  build/systemd/log_nb.o \
+		  build/systemd/pcheck.o
 else ifneq ($(ON_MACOS),)
   daemon-obj-y += build/launchd/ipc.o
-endif
-
-ifeq ($(CONFIG_ENABLE_DEBUG),)
-  daemon-obj-y += build/systemd/pcheck.o
 endif
 
 ifeq ($(CC_HAS_REALLOCARRAY),)
