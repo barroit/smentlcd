@@ -24,7 +24,7 @@ static struct ring *ring;
 static pthread_t worker;
 
 static int auto_commit = 1;
-static int stop = 0;
+static int terminate = 0;
 
 int __log_nb_ring_produce(int fd, const char *prefix, const char *hint,
 			  const char *fmt, va_list ap)
@@ -71,7 +71,7 @@ int log_nb_init(void)
 {
 	int err;
 
-	err = pthread_create(&worker, NULL, __log_nb_worker, &stop);
+	err = pthread_create(&worker, NULL, __log_nb_worker, &terminate);
 	if (err) {
 		warn_errno("can't create worker thread for non-blocking logging system backend");
 		return -1;
@@ -90,42 +90,44 @@ int log_nb_init(void)
 	return __log_nb_init();
 }
 
-void log_nb_activate(void)
+static void __log_nb_terminate(void)
 {
-	__log_vwritef = log_nb_vwritef;
-	__log_nb_stop = log_nb_stop;
-}
-
-void log_nb_deactivate(void)
-{
-	__log_vwritef = log_vwritef;
-	__log_nb_stop = NULL;
-}
-
-void log_nb_auto_commit(int enabled)
-{
-	auto_commit = enabled;
-}
-
-void log_nb_stop(void)
-{
-	stop = 1;
+	terminate = 1;
 	log_nb_wake_up();
 	pthread_join(worker, NULL);
 }
 
-void log_nb_vwritef(int fd, const char *prefix, const char *hint,
-		    const char *fmt, va_list ap)
+static void __log_nb_vwritef(int fd, const char *prefix, const char *hint,
+			     const char *fmt, va_list ap)
 {
 	int full;
 
 	full = __log_nb_ring_produce(fd, prefix, hint, fmt, ap);
 	if (unlikely(full)) {
-		log_vwritef(fd, prefix, hint, fmt, ap);
+		__log_vwritef(fd, prefix, hint, fmt, ap);
 		goto wake_up;
 	}
 
 	if (auto_commit)
 wake_up:
 		log_nb_wake_up();
+}
+
+void log_nb_activate(void)
+{
+	log_vwritef = __log_nb_vwritef;
+	log_nb_terminate = __log_nb_terminate;
+	log_nb_enabled = 1;
+}
+
+void log_nb_deactivate(void)
+{
+	log_vwritef = __log_vwritef;
+	log_nb_terminate = NULL;
+	log_nb_enabled = 0;
+}
+
+void log_nb_auto_commit(int enabled)
+{
+	auto_commit = enabled;
 }

@@ -17,8 +17,9 @@
 #include "size.h"
 #include "strbuf.h"
 
-typeof(log_vwritef) *__log_vwritef = log_vwritef;
-typeof(__log_nb_stop) __log_nb_stop;
+log_vwritef_fn log_vwritef = __log_vwritef;
+log_nb_terminate_fn log_nb_terminate;
+int log_nb_enabled = 0;
 
 size_t __log_format_line(char *buf, size_t cap, const char *prefix,
 			 const char *hint, const char *fmt, va_list ap)
@@ -41,8 +42,8 @@ size_t __log_format_line(char *buf, size_t cap, const char *prefix,
 	return sb.len;
 }
 
-void log_vwritef(int fd, const char *prefix, const char *hint,
-		 const char *fmt, va_list ap)
+void __log_vwritef(int fd, const char *prefix, const char *hint,
+		   const char *fmt, va_list ap)
 {
 	char buf[SZ_2K];
 	size_t len = __log_format_line(buf, sizeof(buf), prefix, hint, fmt, ap);
@@ -56,7 +57,7 @@ void log_writef(int fd, const char *prefix, const char *hint,
 	va_list ap;
 
 	va_start(ap, fmt);
-	__log_vwritef(fd, prefix, hint, fmt, ap);
+	log_vwritef(fd, prefix, hint, fmt, ap);
 
 	va_end(ap);
 }
@@ -108,7 +109,7 @@ void __log_record(const char *func, const char *fmt, ...)
 	assert(nw > 0);
 
 	va_start(ap, fmt);
-	__log_vwritef(STDOUT_FILENO, prefix, NULL, fmt, ap);
+	log_vwritef(STDOUT_FILENO, prefix, NULL, fmt, ap);
 
 	va_end(ap);
 }
@@ -118,7 +119,7 @@ int __log_warn(const char *hint, const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	__log_vwritef(STDERR_FILENO,
+	log_vwritef(STDERR_FILENO,
 		      H("warn:", SGR_BOLD, SGR_YELLOW), hint, fmt, ap);
 
 	va_end(ap);
@@ -130,7 +131,7 @@ int __log_error(const char *hint, const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	__log_vwritef(STDERR_FILENO,
+	log_vwritef(STDERR_FILENO,
 		      H("error:", SGR_BOLD, SGR_RED), hint, fmt, ap);
 
 	va_end(ap);
@@ -142,11 +143,11 @@ void __log_die(const char *hint, const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	__log_vwritef(STDERR_FILENO,
+	log_vwritef(STDERR_FILENO,
 		      H("fatal:", SGR_BOLD, SGR_RED), hint, fmt, ap);
 
-	if (__log_nb_stop)
-		__log_nb_stop();
+	if (log_nb_enabled)
+		log_nb_terminate();
 
 	exit(128);
 }
@@ -156,7 +157,7 @@ void __log_bug(const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	__log_vwritef(STDERR_FILENO, NULL, NULL, fmt, ap);
+	log_vwritef(STDERR_FILENO, NULL, NULL, fmt, ap);
 
 	abort();
 }

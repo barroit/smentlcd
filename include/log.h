@@ -19,6 +19,11 @@ struct message {
 	size_t len;
 };
 
+typedef void (*log_vwritef_fn)(int fd, const char *prefix, const char *hint,
+			       const char *fmt, va_list ap);
+
+typedef void (*log_nb_terminate_fn)(void);
+
 extern char *strerror(int errnum);
 extern const char *libusb_strerror(int errcode);
 
@@ -57,8 +62,10 @@ void __log_die(const char *hint, const char *fmt, ...) __printf(2, 3)
 
 void __log_bug(const char *fmt, ...) __printf(1, 2) __noreturn;
 
-void log_vwritef(int fd, const char *prefix, const char *hint,
-		 const char *fmt, va_list ap);
+void __log_vwritef(int fd, const char *prefix, const char *hint,
+		   const char *fmt, va_list ap);
+
+extern log_vwritef_fn log_vwritef;
 
 void log_writef(int fd, const char *prefix, const char *hint,
 		const char *fmt, ...) __printf(4, 5);
@@ -69,12 +76,16 @@ void log_vprintf(FILE *stream, const char *prefix, const char *hint,
 void log_printf(FILE *stream, const char *prefix, const char *hint,
 		const char *fmt, ...) __printf(4, 5);
 
-extern typeof(log_vwritef) *__log_vwritef;
-
-extern void (*__log_nb_stop)(void);
-
 size_t __log_format_line(char *buf, size_t cap, const char *prefix,
 			 const char *hint, const char *fmt, va_list ap);
+
+extern int log_nb_enabled;
+
+int __log_nb_init(void);
+
+int log_nb_init(void);
+
+extern log_nb_terminate_fn log_nb_terminate;
 
 int __log_nb_ring_produce(int fd, const char *prefix, const char *hint,
 			  const char *fmt, va_list ap);
@@ -83,10 +94,6 @@ int __log_nb_ring_consume(struct message *message);
 
 void *__log_nb_worker(void *userdata);
 
-int __log_nb_init(void);
-
-int log_nb_init(void);
-
 void log_nb_activate(void);
 
 void log_nb_deactivate(void);
@@ -94,10 +101,5 @@ void log_nb_deactivate(void);
 void log_nb_auto_commit(int enabled);
 
 void log_nb_wake_up(void);
-
-void log_nb_stop(void);
-
-void log_nb_vwritef(int fd, const char *prefix, const char *hint,
-		    const char *fmt, va_list ap);
 
 #endif /* LOG_H */
