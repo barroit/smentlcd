@@ -46,11 +46,12 @@ struct ipc_response {
 
 struct ipc_ctx;
 
-typedef void (*ipc_exec_req_fn)(struct ipc_request *, struct ipc_response *);
+typedef void (*ipc_exec_req_fn)(struct ipc_request *, struct ipc_response *,
+				void *userdata);
 
 void ipc_init(struct ipc_ctx **ctx);
 
-void ipc_bind_exec_req(struct ipc_ctx *ctx, ipc_exec_req_fn fn);
+void ipc_bind_exec_req(struct ipc_ctx *ctx, ipc_exec_req_fn fn, void *userdata);
 
 void ipc_listen(struct ipc_ctx *ctx);
 

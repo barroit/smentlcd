@@ -7,6 +7,7 @@
 
 #include <assert.h>
 #include <poll.h>
+#include <stdlib.h>
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-event.h>
 #include <systemd/sd-json.h>
@@ -37,7 +38,9 @@ DECLARE_METHOD(status);
 struct ipc_ctx {
 	struct sd_varlink_server *server;
 	struct sd_event *event;
+
 	ipc_exec_req_fn exec_req;
+	void *userdata;
 };
 
 struct method_map {
@@ -108,7 +111,7 @@ DECLARE_METHOD(brightness)
 	field = sd_json_variant_by_key(parameters, "brightness");
 	req.brightness = sd_json_variant_integer(field);
 
-	ctx->exec_req(&req, &res);
+	ctx->exec_req(&req, &res, ctx->userdata);
 	return emit_final_reply(link, &res);
 }
 
@@ -167,9 +170,10 @@ void ipc_init(struct ipc_ctx **__ctx)
 	*__ctx = &ctx;
 }
 
-void ipc_bind_exec_req(struct ipc_ctx *ctx, ipc_exec_req_fn fn)
+void ipc_bind_exec_req(struct ipc_ctx *ctx, ipc_exec_req_fn fn, void *userdata)
 {
 	ctx->exec_req = fn;
+	ctx->userdata = userdata;
 }
 
 void ipc_listen(struct ipc_ctx *ctx)

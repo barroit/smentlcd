@@ -19,8 +19,17 @@ static void adjust_brightness(struct ipc_response *res, int64_t val)
 	}
 }
 
-static void exec_req(struct ipc_request *req, struct ipc_response *res)
+static void exec_req(struct ipc_request *req, struct ipc_response *res,
+		     void *userdata)
 {
+	struct dev_ctx *dev_ctx = userdata;
+
+	if (!dev_available(dev_ctx)) {
+		res->type = IPC_RES_ERROR;
+		res->error = "device unavailable";
+		return;
+	}
+
 	switch (req->type) {
 	case IPC_REQ_FRAME:
 		break;
@@ -47,7 +56,7 @@ int cmd_main_start(int argc, const char **argv)
 	dev_setup_pollfd(dev_ctx);
 	dev_enable_hotplug(dev_ctx);
 
-	ipc_bind_exec_req(ipc_ctx, exec_req);
+	ipc_bind_exec_req(ipc_ctx, exec_req, dev_ctx);
 	ipc_listen(ipc_ctx);
 
 	cc_trap();

@@ -5,12 +5,12 @@
 
 #include "device.h"
 
+#include <stdalign.h>
+#include <stdlib.h>
+
 #include "ipc.h"
 #include "libusb.h"
 #include "log.h"
-
-#include <stdalign.h>
-#include <stdlib.h>
 
 #define hotplug_register libusb_hotplug_register_callback
 
@@ -135,4 +135,9 @@ void dev_enable_hotplug(struct dev_ctx *ctx)
 			       handle_hotplug, ctx, NULL);
 	if (err)
 		die_libusb(err, "failed to register hotplug event callback");
+}
+
+int dev_available(struct dev_ctx *ctx)
+{
+	return !!ctx->dev;
 }

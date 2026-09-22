@@ -19,4 +19,6 @@ void dev_setup_pollfd(struct dev_ctx *ctx);
 
 void dev_enable_hotplug(struct dev_ctx *ctx);
 
+int dev_available(struct dev_ctx *ctx);
+
 #endif /* DEVICE_H */
