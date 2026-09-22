@@ -7,12 +7,14 @@
 
 #include <assert.h>
 #include <poll.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-event.h>
 #include <systemd/sd-json.h>
 #include <systemd/sd-varlink.h>
 
+#include "device.h"
 #include "libusb.h"
 #include "log.h"
 #include "xalloc.h"
@@ -133,7 +135,7 @@ DECLARE_METHOD(status)
 void ipc_init(void)
 {
 	int err;
-	struct method_map *entry = methods;
+	struct method_map *entry;
 
 	assert(!ctx.server);
 
@@ -147,7 +149,7 @@ void ipc_init(void)
 	if (err)
 		die_errno2(-err, "sd_varlink_server_add_interface() failed");
 
-	for (; entry->name; entry++) {
+	for (entry = methods; entry->name; entry++) {
 		err = sd_varlink_server_bind_method(ctx.server, entry->name,
 						    entry->method);
 		if (err)
@@ -207,8 +209,8 @@ void *ipc_watch_pollfd(size_t nalloc, int fd, short events)
 	if (events & POLLOUT)
 		sd_events |= EPOLLOUT;
 
-	buf = xmalloc(nalloc + sizeof(src));
-	src = (typeof(src))&buf[nalloc];
+	buf = xmalloc(nalloc + sizeof(*src));
+	src = (typeof(src))&buf[cc_offsetof(struct event_source, data)];
 
 	err = sd_event_add_io(ctx.event, src, fd, sd_events, handle_event_io,
 			      NULL);
@@ -225,5 +227,5 @@ void *ipc_watch_pollfd(size_t nalloc, int fd, short events)
 
 void ipc_unwatch_pollfd(void *src)
 {
-	sd_event_source_unref((struct sd_event_source *)src);
+	sd_event_source_unref(*(struct sd_event_source **)src);
 }

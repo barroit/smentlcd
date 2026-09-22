@@ -6,6 +6,18 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
+#include <stdalign.h>
+#include <stddef.h>
+
+#include "list.h"
+
+struct event_source {
+	int fd;
+	struct list_head list;
+
+	alignas(max_align_t) char data[];
+};
+
 void dev_init(void);
 
 void dev_setup_pollfd(void);

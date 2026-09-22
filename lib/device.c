@@ -5,22 +5,13 @@
 
 #include "device.h"
 
-#include <stdalign.h>
 #include <stdlib.h>
 
 #include "ipc.h"
 #include "libusb.h"
-#include "list.h"
 #include "log.h"
 
 #define hotplug_register libusb_hotplug_register_callback
-
-struct event_source {
-	int fd;
-	struct list_head list;
-
-	alignas(max_align_t) char data[];
-};
 
 struct dev_ctx {
 	struct list_head ev_src_list;
