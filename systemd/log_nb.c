@@ -3,7 +3,7 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
-#include "log.h"
+#include "log_nb.h"
 
 #include <errno.h>
 #include <poll.h>
@@ -11,8 +11,12 @@
 #include <sys/eventfd.h>
 #include <unistd.h>
 
+#include "barrier.h"
 #include "compiler.h"
+#include "log.h"
 #include "rio.h"
+
+#define THIS_SYSTEM LOG_NB_SYSTEM_NAME
 
 static int fd;
 
@@ -20,7 +24,7 @@ int __log_nb_init(void)
 {
 	fd = eventfd(0, EFD_NONBLOCK);
 	if (fd == -1) {
-		warn_errno("failed to allocate event fd");
+		warn_errno("failed to allocate event fd for " THIS_SYSTEM);
 		return -1;
 	}
 
@@ -59,7 +63,7 @@ void *__log_nb_worker(void *userdata)
 				goto disable_nb;
 			}
 
-		if (*stop)
+		if (smp_load_acquire(stop))
 			return NULL;
 	}
 
@@ -68,7 +72,7 @@ void *__log_nb_worker(void *userdata)
 disable_nb:
 	log_nb_deactivate();
 	warn_errno("%s", err);
-	record("non-blocking logging system backend disabled");
+	record(THIS_SYSTEM " disabled");
 	return NULL;
 }
 
@@ -79,6 +83,6 @@ void log_nb_wake_up(void)
 	if (rwrite(fd, &val, sizeof(val)) == -1) {
 		log_nb_deactivate();
 		warn_errno("rwrite failed in log_nb_wake_up()");
-		record("non-blocking logging system backend disabled");
+		record(THIS_SYSTEM " disabled");
 	}
 }

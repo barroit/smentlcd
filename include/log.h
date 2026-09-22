@@ -13,16 +13,8 @@
 
 #include "attr.h"
 
-struct message {
-	int fd;
-	char buf[CONFIG_LOG_MESSAGE_BUFFER_SIZE];
-	size_t len;
-};
-
 typedef void (*log_vwritef_fn)(int fd, const char *prefix, const char *hint,
 			       const char *fmt, va_list ap);
-
-typedef void (*log_nb_terminate_fn)(void);
 
 extern char *strerror(int errnum);
 extern const char *libusb_strerror(int errcode);
@@ -78,28 +70,5 @@ void log_printf(FILE *stream, const char *prefix, const char *hint,
 
 size_t __log_format_line(char *buf, size_t cap, const char *prefix,
 			 const char *hint, const char *fmt, va_list ap);
-
-extern int log_nb_enabled;
-
-int __log_nb_init(void);
-
-int log_nb_init(void);
-
-extern log_nb_terminate_fn log_nb_terminate;
-
-int __log_nb_ring_produce(int fd, const char *prefix, const char *hint,
-			  const char *fmt, va_list ap);
-
-int __log_nb_ring_consume(struct message *message);
-
-void *__log_nb_worker(void *userdata);
-
-void log_nb_activate(void);
-
-void log_nb_deactivate(void);
-
-void log_nb_auto_commit(int enabled);
-
-void log_nb_wake_up(void);
 
 #endif /* LOG_H */

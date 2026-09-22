@@ -3,15 +3,20 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
-#include "log.h"
+#include "log_nb.h"
 
+#include <assert.h>
 #include <pthread.h>
+#include <signal.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
 
 #include "barrier.h"
 #include "compiler.h"
-#include "rio.h"
+#include "log.h"
+
+#define THIS_SYSTEM LOG_NB_SYSTEM_NAME
 
 struct ring {
 	struct message messages[CONFIG_LOG_MESSAGE_RING_SIZE];
@@ -22,6 +27,8 @@ struct ring {
 
 static struct ring *ring;
 static pthread_t worker;
+static pthread_t waiter;
+static sigset_t signals;
 
 static int auto_commit = 1;
 static int terminate = 0;
@@ -59,6 +66,7 @@ int __log_nb_ring_consume(struct message *message)
 	if (tail == smp_load_acquire(&ring->head))
 		return -1;
 
+	tail %= CONFIG_LOG_MESSAGE_RING_SIZE;
 	message->fd = ring->messages[tail].fd;
 	message->len = ring->messages[tail].len;
 	memcpy(message->buf, ring->messages[tail].buf, message->len);
@@ -67,20 +75,66 @@ int __log_nb_ring_consume(struct message *message)
 	return 0;
 }
 
+static void *wait_and_drain(void *userdata)
+{
+	int err;
+	int signal;
+
+	err = sigwait(&signals, &signal);
+	assert(!err);
+
+	log_nb_terminate();
+	exit(0);
+}
+
+int log_nb_catch_signal(void)
+{
+	int err;
+	sigset_t oldset;
+
+	sigemptyset(&signals);
+	sigaddset(&signals, SIGTERM);
+
+	err = pthread_sigmask(SIG_BLOCK, &signals, &oldset);
+	assert(!err);
+
+	err = pthread_create(&waiter, NULL, wait_and_drain, NULL);
+	if (err) {
+		warn_errno2(err, "can't create signal thread for " THIS_SYSTEM);
+		return -1;
+	}
+
+	return 0;
+}
+
+void log_nb_restore_signal(void)
+{
+	int err;
+
+	err = pthread_cancel(waiter);
+	assert(!err);
+
+	err = pthread_join(waiter, NULL);
+	if (err)
+		warn_errno2(err,
+			    "can't wait for the waiter thread to finish for "
+			    THIS_SYSTEM);
+}
+
 int log_nb_init(void)
 {
 	int err;
 
 	err = pthread_create(&worker, NULL, __log_nb_worker, &terminate);
 	if (err) {
-		warn_errno("can't create worker thread for non-blocking logging system backend");
+		warn_errno("can't create worker thread for " THIS_SYSTEM);
 		return -1;
 	}
 
 	ring = mmap(NULL, sizeof(*ring), PROT_READ | PROT_WRITE,
 		    MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (ring == MAP_FAILED) {
-		warn_errno("failed to allocate ring buffer for non-blocking logging system backend");
+		warn_errno("failed to allocate ring buffer for " THIS_SYSTEM);
 		return -1;
 	}
 
@@ -92,9 +146,16 @@ int log_nb_init(void)
 
 static void __log_nb_terminate(void)
 {
-	terminate = 1;
+	int err;
+
+	smp_store_release(&terminate, 1);
 	log_nb_wake_up();
-	pthread_join(worker, NULL);
+
+	err = pthread_join(worker, NULL);
+	if (err)
+		warn_errno2(err,
+			    "can't wait for the worker thread to finish for "
+			    THIS_SYSTEM);
 }
 
 static void __log_nb_vwritef(int fd, const char *prefix, const char *hint,

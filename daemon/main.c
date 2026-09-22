@@ -5,6 +5,7 @@
 
 #include "compiler.h"
 #include "log.h"
+#include "log_nb.h"
 #include "parse_argv.h"
 
 #include "stdlib.h"
@@ -23,7 +24,13 @@ int cmd_main(int argc, const char **argv)
 		PA_OPT_END(),
 	};
 
-	err = log_nb_init();
+	err = log_nb_catch_signal();
+	if (!err) {
+		err = log_nb_init();
+		if (err)
+			log_nb_restore_signal();
+	}
+
 	if (err) {
 		record("not using non-blocking logging system backend");
 	} else {
@@ -34,5 +41,5 @@ int cmd_main(int argc, const char **argv)
 	argc = pa_parse_args(argc, argv, opts, usage, 0);
 	cmd(argc, argv);
 
-	exit(0);
+	cc_trap();
 }

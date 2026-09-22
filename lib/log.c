@@ -12,6 +12,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "log_nb.h"
 #include "rio.h"
 #include "sgr.h"
 #include "size.h"
