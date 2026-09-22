@@ -44,20 +44,12 @@ struct ipc_response {
 	};
 };
 
-struct ipc_ctx;
+void ipc_init(void);
 
-typedef void (*ipc_exec_req_fn)(struct ipc_request *, struct ipc_response *,
-				void *userdata);
+void ipc_listen(void);
 
-void ipc_init(struct ipc_ctx **ctx);
+void *ipc_watch_pollfd(size_t nalloc, int fd, short events);
 
-void ipc_bind_exec_req(struct ipc_ctx *ctx, ipc_exec_req_fn fn, void *userdata);
-
-void ipc_listen(struct ipc_ctx *ctx);
-
-void *ipc_watch_pollfd(struct ipc_ctx *ctx, size_t nalloc, int fd,
-		       short events);
-
-void ipc_unwatch_pollfd(struct ipc_ctx *ctx, void *src);
+void ipc_unwatch_pollfd(void *src);
 
 #endif /* IPC_H */

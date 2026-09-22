@@ -17,6 +17,8 @@
 #include "log.h"
 #include "xalloc.h"
 
+void daemon_exec_req(struct ipc_request *req, struct ipc_response *res);
+
 #define DEFINE_METHOD_SCHEME static SD_VARLINK_DEFINE_METHOD
 #define DEFINE_INPUT_SCHEME SD_VARLINK_DEFINE_INPUT
 
@@ -38,10 +40,9 @@ DECLARE_METHOD(status);
 struct ipc_ctx {
 	struct sd_varlink_server *server;
 	struct sd_event *event;
-
-	ipc_exec_req_fn exec_req;
-	void *userdata;
 };
+
+static struct ipc_ctx ctx;
 
 struct method_map {
 	const char *name;
@@ -99,7 +100,6 @@ DECLARE_METHOD(frame)
 
 DECLARE_METHOD(brightness)
 {
-	struct ipc_ctx *ctx = userdata;
 	struct sd_json_variant *field;
 	struct ipc_request req = {
 		.type = IPC_REQ_BRIGHTNESS,
@@ -111,7 +111,7 @@ DECLARE_METHOD(brightness)
 	field = sd_json_variant_by_key(parameters, "brightness");
 	req.brightness = sd_json_variant_integer(field);
 
-	ctx->exec_req(&req, &res, ctx->userdata);
+	daemon_exec_req(&req, &res);
 	return emit_final_reply(link, &res);
 }
 
@@ -130,16 +130,14 @@ DECLARE_METHOD(status)
 	return 0;
 }
 
-void ipc_init(struct ipc_ctx **__ctx)
+void ipc_init(void)
 {
-	static struct ipc_ctx ctx;
 	int err;
 	struct method_map *entry = methods;
 
 	assert(!ctx.server);
 
 	err = sd_varlink_server_new(&ctx.server,
-				    SD_VARLINK_SERVER_INHERIT_USERDATA |
 				    SD_VARLINK_SERVER_ALLOW_FD_PASSING_INPUT);
 	if (err)
 		die_errno2(-err, "sd_varlink_server_new() failed");
@@ -148,8 +146,6 @@ void ipc_init(struct ipc_ctx **__ctx)
 					      &vl_interface_scheme);
 	if (err)
 		die_errno2(-err, "sd_varlink_server_add_interface() failed");
-
-	sd_varlink_server_set_userdata(ctx.server, &ctx);
 
 	for (; entry->name; entry++) {
 		err = sd_varlink_server_bind_method(ctx.server, entry->name,
@@ -166,27 +162,19 @@ void ipc_init(struct ipc_ctx **__ctx)
 	err = sd_varlink_server_attach_event(ctx.server, ctx.event, 0);
 	if (err)
 		die_errno2(-err, "sd_varlink_server_attach_event() failed");
-
-	*__ctx = &ctx;
 }
 
-void ipc_bind_exec_req(struct ipc_ctx *ctx, ipc_exec_req_fn fn, void *userdata)
-{
-	ctx->exec_req = fn;
-	ctx->userdata = userdata;
-}
-
-void ipc_listen(struct ipc_ctx *ctx)
+void ipc_listen(void)
 {
 	int ret;
 
-	ret = sd_varlink_server_listen_auto(ctx->server);
+	ret = sd_varlink_server_listen_auto(ctx.server);
 	if (ret < 0)
 		die_errno2(-ret, "sd_varlink_server_listen_auto() failed");
 	else if (ret == 0)
 		die("no listening socket acquired");
 
-	ret = sd_event_loop(ctx->event);
+	ret = sd_event_loop(ctx.event);
 	if (ret < 0)
 		die_errno2(-ret, "sd_event_loop() failed");
 }
@@ -206,7 +194,7 @@ static int handle_event_io(sd_event_source *src, int fd, uint32_t revents,
 	return 0;
 }
 
-void *ipc_watch_pollfd(struct ipc_ctx *ctx, size_t nalloc, int fd, short events)
+void *ipc_watch_pollfd(size_t nalloc, int fd, short events)
 {
 	int err;
 	char *buf;
@@ -222,8 +210,8 @@ void *ipc_watch_pollfd(struct ipc_ctx *ctx, size_t nalloc, int fd, short events)
 	buf = xmalloc(nalloc + sizeof(src));
 	src = (typeof(src))&buf[nalloc];
 
-	err = sd_event_add_io(ctx->event, src, fd, sd_events, handle_event_io,
-			      ctx);
+	err = sd_event_add_io(ctx.event, src, fd, sd_events, handle_event_io,
+			      NULL);
 	if (err) {
 		error_errno2(-err,
 			     "unable to add libusb pollfd %d as new I/O event source to event loop",
@@ -235,7 +223,7 @@ void *ipc_watch_pollfd(struct ipc_ctx *ctx, size_t nalloc, int fd, short events)
 	return buf;
 }
 
-void ipc_unwatch_pollfd(struct ipc_ctx *ctx, void *src)
+void ipc_unwatch_pollfd(void *src)
 {
 	sd_event_source_unref((struct sd_event_source *)src);
 }

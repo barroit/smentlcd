@@ -5,8 +5,9 @@
 
 #include "ipc.h"
 #include "device.h"
+#include "compiler.h"
 
-#include <stdlib.h>
+void daemon_exec_req(struct ipc_request *req, struct ipc_response *res);
 
 const char *cmd_main_start_help = "start the daemon process";
 
@@ -19,12 +20,9 @@ static void adjust_brightness(struct ipc_response *res, int64_t val)
 	}
 }
 
-static void exec_req(struct ipc_request *req, struct ipc_response *res,
-		     void *userdata)
+void daemon_exec_req(struct ipc_request *req, struct ipc_response *res)
 {
-	struct dev_ctx *dev_ctx = userdata;
-
-	if (!dev_available(dev_ctx)) {
+	if (!dev_available()) {
 		res->type = IPC_RES_ERROR;
 		res->error = "device unavailable";
 		return;
@@ -46,18 +44,13 @@ static void exec_req(struct ipc_request *req, struct ipc_response *res,
 
 int cmd_main_start(int argc, const char **argv)
 {
-	struct ipc_ctx *ipc_ctx;
-	struct dev_ctx *dev_ctx;
+	ipc_init();
+	dev_init();
 
-	ipc_init(&ipc_ctx);
-	dev_init(&dev_ctx);
+	dev_setup_pollfd();
+	dev_enable_hotplug();
 
-	dev_assign_ipc_ctx(dev_ctx, ipc_ctx);
-	dev_setup_pollfd(dev_ctx);
-	dev_enable_hotplug(dev_ctx);
-
-	ipc_bind_exec_req(ipc_ctx, exec_req, dev_ctx);
-	ipc_listen(ipc_ctx);
+	ipc_listen();
 
 	cc_trap();
 	return 0;

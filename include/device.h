@@ -6,19 +6,12 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-#include "list.h"
+void dev_init(void);
 
-struct dev_ctx;
-struct ipc_ctx;
+void dev_setup_pollfd(void);
 
-void dev_init(struct dev_ctx **ctx);
+void dev_enable_hotplug(void);
 
-void dev_assign_ipc_ctx(struct dev_ctx *ctx, struct ipc_ctx *ipc_ctx);
-
-void dev_setup_pollfd(struct dev_ctx *ctx);
-
-void dev_enable_hotplug(struct dev_ctx *ctx);
-
-int dev_available(struct dev_ctx *ctx);
+int dev_available(void);
 
 #endif /* DEVICE_H */
