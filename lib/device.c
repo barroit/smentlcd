@@ -57,8 +57,10 @@ static void watch_pollfd(int fd, short events, void *userdata)
 	struct event_source *ev_src;
 
 	ev_src = ipc_watch_pollfd(ctx->ipc_ctx, sizeof(*ev_src), fd, events);
-	ev_src->fd = fd;
+	if (!ev_src)
+		return;
 
+	ev_src->fd = fd;
 	list_add_tail(&ev_src->list, &ctx->ev_src_list);
 }
 
@@ -80,7 +82,8 @@ static void unwatch_pollfd(int fd, void *userdata)
 
 void dev_setup_pollfd(struct dev_ctx *ctx)
 {
-	const struct libusb_pollfd **__fds, **fds;
+	const struct libusb_pollfd **__fds;
+	const struct libusb_pollfd **fds;
 
 	__fds = libusb_get_pollfds(NULL);
 	if (!__fds)

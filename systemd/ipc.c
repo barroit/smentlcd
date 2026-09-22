@@ -195,8 +195,7 @@ static int handle_event_io(sd_event_source *src, int fd, uint32_t revents,
 
 	err = libusb_handle_events_timeout(NULL, &tv);
 	if (err < 0) {
-		error_libusb(-err,
-			     "libusb cannot handle pending events");
+		error_libusb(-err, "libusb cannot handle pending events");
 		return -1;
 	}
 
@@ -221,10 +220,13 @@ void *ipc_watch_pollfd(struct ipc_ctx *ctx, size_t nalloc, int fd, short events)
 
 	err = sd_event_add_io(ctx->event, src, fd, sd_events, handle_event_io,
 			      ctx);
-	if (err)
+	if (err) {
 		error_errno2(-err,
 			     "unable to add libusb pollfd %d as new I/O event source to event loop",
 			     fd);
+		free(buf);
+		return NULL;
+	}
 
 	return buf;
 }
