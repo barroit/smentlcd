@@ -30,11 +30,11 @@ static inline void list_head_init(struct list_head *head)
 	head->prev = head;
 }
 
-void __cold __noreturn __list_die_add(const struct list_head *new,
-				      const struct list_head *prev,
-				      const struct list_head *next);
+void attr_cold attr_noreturn __list_die_add(const struct list_head *new,
+					    const struct list_head *prev,
+					    const struct list_head *next);
 
-void __cold __noreturn __list_die_del(const struct list_head *entry);
+void attr_cold attr_noreturn __list_die_del(const struct list_head *entry);
 
 static inline void __list_add(struct list_head *new,
 			      struct list_head *prev,

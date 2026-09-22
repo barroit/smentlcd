@@ -60,7 +60,7 @@ extern unitest_hook_t unitest_teardown;
 	unitest_hook_t unitest_teardown = &__ut_teardown;	\
 	static void __ut_teardown(void)
 
-#define __ut_ld_sec __section(__ut_ld_sec_name) __ut_no_asan __used
+#define __ut_ld_sec attr_section(__ut_ld_sec_name) __ut_no_asan attr_always_used
 
 #ifdef __APPLE__
 # define __ut_ld_sec_name "__DATA,__miku_test"
@@ -69,7 +69,7 @@ extern unitest_hook_t unitest_teardown;
 #endif
 
 #ifdef CC_HAS_VARIABLE_NO_SANITIZE
-# define __ut_no_asan __no_asan
+# define __ut_no_asan attr_no_asan
 #else
 # define __ut_no_asan
 #endif

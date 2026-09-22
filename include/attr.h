@@ -9,61 +9,51 @@
 /*
  * optimization & inlining
  */
+#define attr_always_inline inline __attribute__((__always_inline__))
 
-#undef __always_inline
-#define __always_inline inline __attribute__((__always_inline__))
-
-#undef __cold
-#define __cold __attribute__((__cold__))
+#define attr_cold __attribute__((__cold__))
 
 /*
  * function behavior & semantics
  */
+#define attr_noreturn __attribute__((__noreturn__))
 
-#define __noreturn __attribute__((__noreturn__))
+#define attr_pure __attribute__((__pure__))
 
-#undef __pure
-#define __pure __attribute__((__pure__))
+#define attr_malloc __attribute__((__malloc__))
 
-#define __malloc __attribute__((__malloc__))
-
-#define __cleanup(x) __attribute__((__cleanup__(x)))
+#define attr_cleanup(x) __attribute__((__cleanup__(x)))
 
 /*
  * static analysis & diagnostics
  */
+#define attr_printf(fmt, va) __attribute__((__format__(__printf__, fmt, va)))
 
-#define __printf(fmt, va) __attribute__((__format__(__printf__, fmt, va)))
-
-#define __warn_unused_result __attribute__((__warn_unused_result__))
+#define attr_warn_unused_result __attribute__((__warn_unused_result__))
 
 #if __has_attribute(__access__)
-# define __read_only(...) \
+# define attr_read_only(...) \
 	 __attribute__((__access__(__read_only__, __VA_ARGS__)))
 #else
-# define __read_only(...)
+# define attr_read_only(...)
 #endif
 
 /*
  * usage & visibility
  */
+#define attr_always_used __attribute__((__used__))
 
-#undef __used
-#define __used __attribute__((__used__))
-
-#define __maybe_unused __attribute__((__unused__))
+#define attr_maybe_unused __attribute__((__unused__))
 
 /*
  * linker & symbol control
  */
+#define attr_section(x) __attribute__((__section__(x)))
 
-#define __section(x) __attribute__((__section__(x)))
+#define attr_constructor __attribute__((__constructor__))
 
-#define __constructor __attribute__((__constructor__))
+#define attr_weak __attribute__((weak))
 
-#undef __weak
-#define __weak __attribute__((weak))
-
-#define __no_asan __attribute__((no_sanitize("address")))
+#define attr_no_asan __attribute__((no_sanitize("address")))
 
 #endif /* ATTR_H */

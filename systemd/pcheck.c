@@ -8,7 +8,7 @@
 
 #include <systemd/sd-id128.h>
 
-static void __constructor require_systemd(void)
+static void attr_constructor require_systemd(void)
 {
 	int err;
 	sd_id128_t id;

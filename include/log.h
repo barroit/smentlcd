@@ -43,16 +43,16 @@ extern const char *libusb_strerror(int errcode);
 	__log_bug("%s:%d,%s(): " fmt, __FILE__, __LINE__, __func__,	\
 		  ##__VA_ARGS__)
 
-void __log_record(const char *func, const char *fmt, ...) __printf(2, 3);
+void __log_record(const char *func, const char *fmt, ...) attr_printf(2, 3);
 
-int __log_warn(const char *hint, const char *fmt, ...) __printf(2, 3);
+int __log_warn(const char *hint, const char *fmt, ...) attr_printf(2, 3);
 
-int __log_error(const char *hint, const char *fmt, ...) __printf(2, 3);
+int __log_error(const char *hint, const char *fmt, ...) attr_printf(2, 3);
 
-void __log_die(const char *hint, const char *fmt, ...) __printf(2, 3)
-						       __noreturn;
+void __log_die(const char *hint, const char *fmt, ...) attr_printf(2, 3)
+						       attr_noreturn;
 
-void __log_bug(const char *fmt, ...) __printf(1, 2) __noreturn;
+void __log_bug(const char *fmt, ...) attr_printf(1, 2) attr_noreturn;
 
 void __log_vwritef(int fd, const char *prefix, const char *hint,
 		   const char *fmt, va_list ap);
@@ -60,13 +60,13 @@ void __log_vwritef(int fd, const char *prefix, const char *hint,
 extern log_vwritef_fn log_vwritef;
 
 void log_writef(int fd, const char *prefix, const char *hint,
-		const char *fmt, ...) __printf(4, 5);
+		const char *fmt, ...) attr_printf(4, 5);
 
 void log_vprintf(FILE *stream, const char *prefix, const char *hint,
 		 const char *fmt, va_list ap);
 
 void log_printf(FILE *stream, const char *prefix, const char *hint,
-		const char *fmt, ...) __printf(4, 5);
+		const char *fmt, ...) attr_printf(4, 5);
 
 size_t __log_format_line(char *buf, size_t cap, const char *prefix,
 			 const char *hint, const char *fmt, va_list ap);

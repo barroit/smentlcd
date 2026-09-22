@@ -52,6 +52,6 @@ size_t sb_vwritef_at(struct strbuf *sb,
 		     size_t pos, const char *fmt, va_list ap);
 
 size_t sb_writef_at(struct strbuf *sb,
-		    size_t pos, const char *fmt, ...) __printf(3, 4);
+		    size_t pos, const char *fmt, ...) attr_printf(3, 4);
 
 #endif /* STRBUF_H */
