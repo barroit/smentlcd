@@ -189,7 +189,7 @@ static int handle_event_io(sd_event_source *src, int fd, uint32_t revents,
 
 	err = libusb_handle_events_timeout(NULL, &tv);
 	if (err < 0) {
-		error_libusb(-err, "libusb cannot handle pending events");
+		error_libusb(-err, "libusb can't handle pending events");
 		return -1;
 	}
 
