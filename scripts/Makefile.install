@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+.PHONY: install uninstall
+
+install: install_$(SERVICE)
+
+uninstall: uninstall_$(SERVICE)
+
+.PHONY: install_systemd uninstall_systemd
+
+install_systemd: install_program
+	printf '%s' \
+	       'SUBSYSTEM=="usb", ' \
+	       'GROUP="smentlcd", ' \
+	       'MODE="0660", ' | \
+	sudo tee /etc/udev/rules.d/39-smentlcd.rules
+
+	printf 'ATTR{idVendor}=="%s", ATTR{idProduct}=="%s"\n' \
+	       $$(cut -f1 device_info) $$(cut -f2 device_info) | \
+	sudo tee -a /etc/udev/rules.d/39-smentlcd.rules
+
+	sudo groupadd -f smentlcd
+	sudo usermod -aG smentlcd $$USER
+	sudo udevadm control --reload-rules
+
+	mkdir -p $(HOME)/.config/systemd/user
+	cp systemd/smentlcd.* $(HOME)/.config/systemd/user
+	systemctl --user daemon-reload
+
+uninstall_systemd:
+	systemctl --user stop smentlcd.service smentlcd.socket
+	systemctl --user disable smentlcd.service smentlcd.socket
+	systemctl --user daemon-reload
+
+	sudo rm /etc/udev/rules.d/39-smentlcd.rules
+
+	sudo gpasswd -d $$USER smentlcd
+	sudo groupdel smentlcd
+	sudo udevadm control --reload-rules
+
+.PHONY: install_program
+
+install_program: $(HOME)/.local/bin/$(name)d $(HOME)/.local/bin/$(name)ctl
+
+$(HOME)/.local/bin/$(name)d: build/$(name)d
+	cp $< $@
+
+$(HOME)/.local/bin/$(name)ctl: build/$(name)ctl
+	cp $< $@

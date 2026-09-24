@@ -8,11 +8,11 @@ config UTF8_LOCALE
 
 config SMENT_VID
 	int "SpaceMouse Enterprice vendor ID"
-	default 0x256f
+	default 0x$(cut,$(first-line,device_info),1)
 
 config SMENT_PID
 	int "SpaceMouse Enterprice product ID"
-	default 0xc633
+	default 0x$(cut,$(first-line,device_info),2)
 
 config RECORD_SHOW_TIMESTAMP
 	bool "Prefix record message with timestamp"

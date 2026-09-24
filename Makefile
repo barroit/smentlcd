@@ -11,7 +11,8 @@ MAKEFLAGS += -rR
 
 build/$(name): build/$(name)d build/$(name)ctl
 
-stage3_tagets := %.o %/d.h %/entry dev_% build/$(name)% build/t/unit/% miku
+stage3_tagets := %.o %/d.h %/entrybuild/$(name)% build/t/unit/% \
+		 dev_% .dev_% install% uninstall% miku
 current_tagets := $(or $(MAKECMDGOALS),miku)
 
 print_db := $(findstring p,$(firstword $(MAKEFLAGS)))
@@ -47,6 +48,7 @@ ifneq ($(on_stage3),)
 endif
 
 include scripts/Makefile.flags
+include scripts/Makefile.install
 include scripts/Makefile.develop
 
 lib-obj-y += build/lib/atexit.o \

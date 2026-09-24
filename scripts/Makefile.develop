@@ -1,24 +1,28 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-.PHONY: .dev_setup_systemd .dev_teardown_systemd .dev_monitor_systemd
+.PHONY: dev_setup_unit dev_teardown_unit dev_monitor dev_link_program
 
-.dev_setup_systemd:
+dev_setup_unit: .dev_setup_unit_$(SERVICE)
+
+dev_teardown_unit: .dev_teardown_unit_$(SERVICE)
+
+dev_monitor: .dev_monitor_$(SERVICE)
+
+dev_link_program: build/$(name)
+	rm -f $(HOME)/.local/bin/$(name)*
+	ln -s $(realpath build/$(name)d build/$(name)ctl) $(HOME)/.local/bin
+
+.PHONY: .dev_setup_unit_systemd .dev_teardown_unit_systemd .dev_monitor_systemd
+
+.dev_setup_unit_systemd:
 	systemctl --user link $$(realpath systemd/smentlcd.*)
 	systemctl --user daemon-reload
 	systemctl --user start smentlcd.service
 
-.dev_teardown_systemd:
+.dev_teardown_unit_systemd:
 	systemctl --user stop smentlcd.service smentlcd.socket
 	systemctl --user disable smentlcd.service smentlcd.socket
 	systemctl --user daemon-reload
 
 .dev_monitor_systemd:
 	journalctl --user --follow --unit smentlcd.service
-
-.PHONY: dev_setup dev_teardown dev_monitor
-
-dev_setup: .dev_setup_$(SERVICE)
-
-dev_teardown: .dev_teardown_$(SERVICE)
-
-dev_monitor: .dev_monitor_$(SERVICE)
