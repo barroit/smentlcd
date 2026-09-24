@@ -45,7 +45,6 @@ ifneq ($(on_stage3),)
   USE_GCC != test $$(cat build/probe/cc/id) = gcc && printf y
   USE_CLANG != test $$(cat build/probe/cc/id) = clang && printf y
 
-  ON_MACOS != test $$(cat build/probe/host/id) = darwin && printf y
   ON_LINUX != test $$(cat build/probe/host/id) = linux && printf y
 endif
 
@@ -72,8 +71,6 @@ ifneq ($(ON_LINUX),)
   daemon-obj-y += build/systemd/ipc.o \
 		  build/systemd/log_nb.o \
 		  build/systemd/pcheck.o
-else ifneq ($(ON_MACOS),)
-  daemon-obj-y += build/launchd/ipc.o
 endif
 
 ifeq ($(CC_HAS_REALLOCARRAY),)
