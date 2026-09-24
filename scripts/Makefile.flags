@@ -84,7 +84,7 @@ endif
 
 DAEMON_LDFLAGS += -pthread
 
-ifneq ($(ON_LINUX),)
+ifeq ($(SERVICE),systemd)
   DAEMON_LDFLAGS += -ludev -lsystemd
 endif
 

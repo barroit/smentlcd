@@ -11,7 +11,7 @@ MAKEFLAGS += -rR
 
 build/$(name): build/$(name)d build/$(name)ctl
 
-stage3_tagets := %.o %/d.h %/entry miku build/$(name)% build/t/unit/%
+stage3_tagets := %.o %/d.h %/entry dev_% build/$(name)% build/t/unit/% miku
 current_tagets := $(or $(MAKECMDGOALS),miku)
 
 print_db := $(findstring p,$(firstword $(MAKEFLAGS)))
@@ -22,8 +22,6 @@ define mv_stale
 	test -f $(2) && cmp -s $(1) $(2) && test -z "$(3)" || \
 	{ mv $(1) $(2) && touch $(2); }
 endef
-
-include scripts/Makefile.develop
 
 include scripts/Makefile.probe
 include scripts/Makefile.kconfig
@@ -43,12 +41,13 @@ ifneq ($(on_stage3),)
   LD != cat build/probe/ld/id
 
   USE_GCC != test $$(cat build/probe/cc/id) = gcc && printf y
-  USE_CLANG != test $$(cat build/probe/cc/id) = clang && printf y
+  USE_CLANG != test $$(cat build/probe/cc/id) = clang && printf 
 
-  ON_LINUX != test $$(cat build/probe/host/id) = linux && printf y
+  SERVICE != test $$(cat build/probe/host/id) = linux && printf systemd
 endif
 
 include scripts/Makefile.flags
+include scripts/Makefile.develop
 
 lib-obj-y += build/lib/atexit.o \
 	     build/lib/list.o \
@@ -67,7 +66,7 @@ lib-obj-y += build/lib/atexit.o \
 daemon-obj-y += build/lib/device.o \
 		build/lib/log_nb.o
 
-ifneq ($(ON_LINUX),)
+ifeq ($(SERVICE),systemd)
   daemon-obj-y += build/systemd/ipc.o \
 		  build/systemd/log_nb.o \
 		  build/systemd/pcheck.o
