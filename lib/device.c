@@ -21,7 +21,23 @@ struct dev_ctx {
 	struct libusb_device_descriptor dd;
 };
 
+int dev_wake_libusb(void);
+
 static struct dev_ctx ctx;
+
+int dev_wake_libusb(void)
+{
+	int err;
+	struct timeval tv = { 0 };
+
+	err = libusb_handle_events_timeout(NULL, &tv);
+	if (err < 0) {
+		error_libusb(-err, "libusb can't handle pending events");
+		return -1;
+	}
+
+	return 0;
+}
 
 void dev_init(void)
 {
@@ -40,8 +56,9 @@ void dev_init(void)
 static void watch_pollfd(int fd, short events, void *userdata)
 {
 	struct event_source *ev_src;
+	size_t nalloc = cc_offsetof(struct event_source, data);
 
-	ev_src = ev_watch_pollfd(sizeof(*ev_src), fd, events);
+	ev_src = ev_watch_pollfd(nalloc, fd, events);
 	if (!ev_src)
 		return;
 

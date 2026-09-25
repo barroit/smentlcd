@@ -11,14 +11,14 @@
 #include <stdlib.h>
 #include <systemd/sd-event.h>
 
-#include "device.h"
-#include "libusb.h"
 #include "log.h"
 #include "xalloc.h"
 
 struct ev_ctx {
 	struct sd_event *event;
 };
+
+int dev_wake_libusb(void);
 
 static struct ev_ctx ctx;
 
@@ -49,16 +49,7 @@ void ev_start_loop(void)
 static int handle_event_io(sd_event_source *src, int fd, uint32_t revents,
 			   void *userdata)
 {
-	int err;
-	struct timeval tv = { 0 };
-
-	err = libusb_handle_events_timeout(NULL, &tv);
-	if (err < 0) {
-		error_libusb(-err, "libusb can't handle pending events");
-		return -1;
-	}
-
-	return 0;
+	return dev_wake_libusb();
 }
 
 void *ev_watch_pollfd(size_t nalloc, int fd, short events)
@@ -75,7 +66,7 @@ void *ev_watch_pollfd(size_t nalloc, int fd, short events)
 		sd_events |= EPOLLOUT;
 
 	buf = xmalloc(nalloc + sizeof(*src));
-	src = (typeof(src))&buf[cc_offsetof(struct event_source, data)];
+	src = (typeof(src))&buf[nalloc];
 
 	err = sd_event_add_io(ctx.event, src, fd, sd_events, handle_event_io,
 			      NULL);
