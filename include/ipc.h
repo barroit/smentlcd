@@ -7,7 +7,6 @@
 #define IPC_H
 
 #include <inttypes.h>
-#include <stddef.h>
 
 #define IPC_INTERFACE_NAME "sh.barroit." BUILD_REPO_NAME
 
@@ -47,9 +46,5 @@ struct ipc_response {
 void ipc_init(void);
 
 void ipc_listen(void);
-
-void *ipc_watch_pollfd(size_t nalloc, int fd, short events);
-
-void ipc_unwatch_pollfd(void *src);
 
 #endif /* IPC_H */

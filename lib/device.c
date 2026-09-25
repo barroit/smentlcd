@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-#include "ipc.h"
+#include "event.h"
 #include "libusb.h"
 #include "log.h"
 
@@ -41,7 +41,7 @@ static void watch_pollfd(int fd, short events, void *userdata)
 {
 	struct event_source *ev_src;
 
-	ev_src = ipc_watch_pollfd(sizeof(*ev_src), fd, events);
+	ev_src = ev_watch_pollfd(sizeof(*ev_src), fd, events);
 	if (!ev_src)
 		return;
 
@@ -55,7 +55,7 @@ static void unwatch_pollfd(int fd, void *userdata)
 
 	list_foreach_entry(ev_src, &ctx.ev_src_list, list) {
 		if (ev_src->fd == fd) {
-			ipc_unwatch_pollfd(ev_src->data);
+			ev_unwatch_pollfd(ev_src->data);
 			list_del(&ev_src->list);
 
 			free(ev_src);

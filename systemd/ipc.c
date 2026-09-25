@@ -6,18 +6,12 @@
 #include "ipc.h"
 
 #include <assert.h>
-#include <poll.h>
-#include <stddef.h>
-#include <stdlib.h>
 #include <systemd/sd-daemon.h>
-#include <systemd/sd-event.h>
 #include <systemd/sd-json.h>
 #include <systemd/sd-varlink.h>
 
-#include "device.h"
-#include "libusb.h"
+#include "event.h"
 #include "log.h"
-#include "xalloc.h"
 
 void daemon_exec_req(struct ipc_request *req, struct ipc_response *res);
 
@@ -41,7 +35,6 @@ DECLARE_METHOD(status);
 
 struct ipc_ctx {
 	struct sd_varlink_server *server;
-	struct sd_event *event;
 };
 
 static struct ipc_ctx ctx;
@@ -157,11 +150,7 @@ void ipc_init(void)
 				   "sd_varlink_server_bind_method() failed");
 	}
 
-	err = sd_event_default(&ctx.event);
-	if (err < 0)
-		die_errno2(-err, "sd_event_default() failed");
-
-	err = sd_varlink_server_attach_event(ctx.server, ctx.event, 0);
+	err = sd_varlink_server_attach_event(ctx.server, ev_current, 0);
 	if (err)
 		die_errno2(-err, "sd_varlink_server_attach_event() failed");
 }
@@ -175,57 +164,4 @@ void ipc_listen(void)
 		die_errno2(-ret, "sd_varlink_server_listen_auto() failed");
 	else if (ret == 0)
 		die("no listening socket acquired");
-
-	ret = sd_event_loop(ctx.event);
-	if (ret < 0)
-		die_errno2(-ret, "sd_event_loop() failed");
-}
-
-static int handle_event_io(sd_event_source *src, int fd, uint32_t revents,
-			   void *userdata)
-{
-	int err;
-	struct timeval tv = { 0 };
-
-	err = libusb_handle_events_timeout(NULL, &tv);
-	if (err < 0) {
-		error_libusb(-err, "libusb can't handle pending events");
-		return -1;
-	}
-
-	return 0;
-}
-
-void *ipc_watch_pollfd(size_t nalloc, int fd, short events)
-{
-	int err;
-	char *buf;
-	struct sd_event_source **src;
-	uint32_t sd_events = 0;
-
-	if (events & POLLIN)
-		sd_events |= EPOLLIN;
-
-	if (events & POLLOUT)
-		sd_events |= EPOLLOUT;
-
-	buf = xmalloc(nalloc + sizeof(*src));
-	src = (typeof(src))&buf[cc_offsetof(struct event_source, data)];
-
-	err = sd_event_add_io(ctx.event, src, fd, sd_events, handle_event_io,
-			      NULL);
-	if (err) {
-		error_errno2(-err,
-			     "unable to add libusb pollfd %d as new I/O event source to event loop",
-			     fd);
-		free(buf);
-		return NULL;
-	}
-
-	return buf;
-}
-
-void ipc_unwatch_pollfd(void *src)
-{
-	sd_event_source_unref(*(struct sd_event_source **)src);
 }

@@ -69,7 +69,8 @@ daemon-obj-y += build/lib/device.o \
 		build/lib/log_nb.o
 
 ifeq ($(SERVICE),systemd)
-  daemon-obj-y += build/systemd/ipc.o \
+  daemon-obj-y += build/systemd/event.o \
+		  build/systemd/ipc.o \
 		  build/systemd/log_nb.o \
 		  build/systemd/pcheck.o
 endif

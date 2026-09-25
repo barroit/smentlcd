@@ -6,6 +6,7 @@
 #include "ipc.h"
 #include "device.h"
 #include "compiler.h"
+#include "event.h"
 
 void daemon_exec_req(struct ipc_request *req, struct ipc_response *res);
 
@@ -44,6 +45,7 @@ void daemon_exec_req(struct ipc_request *req, struct ipc_response *res)
 
 int cmd_main_start(int argc, const char **argv)
 {
+	ev_init();
 	ipc_init();
 	dev_init();
 
@@ -51,6 +53,7 @@ int cmd_main_start(int argc, const char **argv)
 	dev_enable_hotplug();
 
 	ipc_listen();
+	ev_start_loop();
 
 	cc_trap();
 	return 0;
