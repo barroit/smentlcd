@@ -14,9 +14,9 @@
 #define hotplug_register libusb_hotplug_register_callback
 
 struct dev_ctx {
+	int available;
 	struct list_head ev_src_list;
 
-	struct libusb_device *dev;
 	struct libusb_device_handle *dh;
 	struct libusb_device_descriptor dd;
 };
@@ -112,21 +112,21 @@ static int handle_hotplug(struct libusb_context *libusb,
 			return 0;
 		}
 
-		ctx.dev = dev;
 		/*
 		 * Since libusb-1.0.16, this function always succeeds.
 		 */
 		libusb_get_device_descriptor(dev, &ctx.dd);
 
+		ctx.available = 1;
 		record("device %" PRIx16 ":%" PRIx16 " plugged",
 		       ctx.dd.idVendor, ctx.dd.idProduct);
 		break;
 
 	case LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT:
 		libusb_close(ctx.dh);
-		ctx.dev = NULL;
 		ctx.dh = NULL;
 
+		ctx.available = 0;
 		record("device %" PRIx16 ":%" PRIx16 " unplugged",
 		       ctx.dd.idVendor, ctx.dd.idProduct);
 	}
@@ -151,5 +151,5 @@ void dev_enable_hotplug(void)
 
 int dev_available(void)
 {
-	return !!ctx.dev;
+	return ctx.available;
 }
