@@ -10,11 +10,15 @@
 
 struct sd_event;
 
+typedef void (*ev_handler_fn)(void);
+
 extern struct sd_event *ev_current;
 
 void ev_init(void);
 
 void ev_start_loop(void);
+
+int ev_sched_once(ev_handler_fn handler);
 
 void *ev_watch_pollfd(size_t nalloc, int fd, short events);
 

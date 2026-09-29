@@ -5,6 +5,8 @@
 
 #include "device.h"
 
+#include <inttypes.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "event.h"
@@ -13,8 +15,11 @@
 
 #define hotplug_register libusb_hotplug_register_callback
 
+#define DEV_PLUGGED (1 << 0)
+#define DEV_ENABLED (1 << 1)
+
 struct dev_ctx {
-	int available;
+	uint32_t status;
 	struct list_head ev_src_list;
 
 	struct libusb_device_handle *dh;
@@ -98,6 +103,28 @@ void dev_setup_pollfd(void)
 	libusb_free_pollfds(__fds);
 }
 
+static void disable_device(void)
+{
+	ctx.status &= ~DEV_ENABLED;
+	record("device disabled");
+}
+
+static void claim_lcd_interface(void)
+{
+	int err;
+
+	if (!(ctx.status & DEV_PLUGGED))
+		return;
+
+	err = libusb_claim_interface(ctx.dh, 0);
+	if (err) {
+		error_libusb(err, "can't claim device interface for LCD I/O");
+		disable_device();
+	} else {
+		ctx.status |= DEV_ENABLED;
+	}
+}
+
 static int handle_hotplug(struct libusb_context *libusb,
 			  struct libusb_device *dev,
 			  libusb_hotplug_event event, void *userdata)
@@ -106,29 +133,36 @@ static int handle_hotplug(struct libusb_context *libusb,
 
 	switch (event) {
 	case LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED:
+		ctx.status |= DEV_PLUGGED;
+		/*
+		 * Since libusb-1.0.16, this function always succeeds.
+		 */
+		libusb_get_device_descriptor(dev, &ctx.dd);
+
+		record("device %" PRIx16 ":%" PRIx16 " plugged",
+		       ctx.dd.idVendor, ctx.dd.idProduct);
+
 		err = libusb_open(dev, &ctx.dh);
 		if (err) {
 			error_libusb(err, "can't open device for I/O");
 			return 0;
 		}
 
-		/*
-		 * Since libusb-1.0.16, this function always succeeds.
-		 */
-		libusb_get_device_descriptor(dev, &ctx.dd);
+		err = ev_sched_once(claim_lcd_interface);
+		if (err) {
+			disable_device();
+			break;
+		}
 
-		ctx.available = 1;
-		record("device %" PRIx16 ":%" PRIx16 " plugged",
-		       ctx.dd.idVendor, ctx.dd.idProduct);
 		break;
 
 	case LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT:
-		libusb_close(ctx.dh);
-		ctx.dh = NULL;
+		ctx.status = 0;
 
-		ctx.available = 0;
 		record("device %" PRIx16 ":%" PRIx16 " unplugged",
 		       ctx.dd.idVendor, ctx.dd.idProduct);
+
+		libusb_close(ctx.dh);
 	}
 
 	return 0;
@@ -149,7 +183,7 @@ void dev_enable_hotplug(void)
 		die_libusb(err, "failed to register hotplug event callback");
 }
 
-int dev_available(void)
+int dev_enabled(void)
 {
-	return ctx.available;
+	return ctx.status & DEV_ENABLED;
 }

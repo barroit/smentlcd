@@ -24,6 +24,6 @@ void dev_setup_pollfd(void);
 
 void dev_enable_hotplug(void);
 
-int dev_available(void);
+int dev_enabled(void);
 
 #endif /* DEVICE_H */

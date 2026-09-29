@@ -6,6 +6,7 @@
 #ifndef SIZE_H
 #define SIZE_H
 
+#define SZ_16   0x10
 #define SZ_32   0x20
 #define SZ_64   0x40
 #define SZ_128  0x80

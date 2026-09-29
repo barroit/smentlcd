@@ -23,7 +23,7 @@ static void adjust_brightness(struct ipc_response *res, int64_t val)
 
 void daemon_exec_req(struct ipc_request *req, struct ipc_response *res)
 {
-	if (!dev_available()) {
+	if (!dev_enabled()) {
 		res->type = IPC_RES_ERROR;
 		res->error = "device unavailable";
 		return;
