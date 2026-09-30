@@ -28,9 +28,7 @@ static int method_ ## name(sd_varlink *link,			\
 			   void *userdata)
 
 DECLARE_METHOD(frame);
-DECLARE_METHOD(brightness);
 DECLARE_METHOD(clear);
-DECLARE_METHOD(power);
 DECLARE_METHOD(status);
 
 struct ipc_ctx {
@@ -47,13 +45,7 @@ struct method_map {
 DEFINE_METHOD_SCHEME(Frame,
 		     DEFINE_INPUT_SCHEME(fd, SD_VARLINK_INT, 0));
 
-DEFINE_METHOD_SCHEME(Brightness,
-		     DEFINE_INPUT_SCHEME(brightness, SD_VARLINK_INT, 0));
-
 DEFINE_METHOD_SCHEME(Clear);
-
-DEFINE_METHOD_SCHEME(Power,
-		     DEFINE_INPUT_SCHEME(on, SD_VARLINK_BOOL, 0));
 
 DEFINE_METHOD_SCHEME(Status);
 
@@ -62,17 +54,13 @@ DEFINE_ERROR_SCHEME(Error,
 
 static SD_VARLINK_DEFINE_INTERFACE(scheme, IPC_INTERFACE_NAME,
 				   &vl_method_Frame,
-				   &vl_method_Brightness,
 				   &vl_method_Clear,
-				   &vl_method_Power,
 				   &vl_method_Status,
 				   &vl_error_Error);
 
 static struct method_map methods[] = {
 	{ IPC_INTERFACE_NAME ".Frame", method_frame },
-	{ IPC_INTERFACE_NAME ".Brightness", method_brightness },
 	{ IPC_INTERFACE_NAME ".Clear", method_clear },
-	{ IPC_INTERFACE_NAME ".Power", method_power },
 	{ IPC_INTERFACE_NAME ".Status", method_status },
 	{ NULL, NULL },
 };
@@ -93,29 +81,7 @@ DECLARE_METHOD(frame)
 	return 0;
 }
 
-DECLARE_METHOD(brightness)
-{
-	struct sd_json_variant *field;
-	struct ipc_request req = {
-		.type = IPC_REQ_BRIGHTNESS,
-	};
-	struct ipc_response res = { 0 };
-
-	record("running");
-
-	field = sd_json_variant_by_key(parameters, "brightness");
-	req.brightness = sd_json_variant_integer(field);
-
-	daemon_exec_req(&req, &res);
-	return emit_final_reply(link, &res);
-}
-
 DECLARE_METHOD(clear)
-{
-	return 0;
-}
-
-DECLARE_METHOD(power)
 {
 	return 0;
 }

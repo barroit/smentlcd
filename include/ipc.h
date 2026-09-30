@@ -6,15 +6,11 @@
 #ifndef IPC_H
 #define IPC_H
 
-#include <inttypes.h>
-
 #define IPC_INTERFACE_NAME "sh.barroit." BUILD_REPO_NAME
 
 enum ipc_request_type {
 	IPC_REQ_FRAME,
-	IPC_REQ_BRIGHTNESS,
 	IPC_REQ_CLEAR,
-	IPC_REQ_POWER,
 	IPC_REQ_STATUS,
 };
 
@@ -31,7 +27,6 @@ struct ipc_device_status {
 struct ipc_request {
 	enum ipc_request_type type;
 	union {
-		int64_t brightness;
 	};
 };
 
