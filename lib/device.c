@@ -22,6 +22,7 @@ struct dev_ctx {
 	uint32_t status;
 	struct list_head ev_src_list;
 
+	struct libusb_device *dev;
 	struct libusb_device_handle *dh;
 	struct libusb_device_descriptor dd;
 };
@@ -134,6 +135,8 @@ static int handle_hotplug(struct libusb_context *libusb,
 	switch (event) {
 	case LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED:
 		ctx.status |= DEV_PLUGGED;
+
+		ctx.dev = dev;
 		/*
 		 * Since libusb-1.0.16, this function always succeeds.
 		 */
