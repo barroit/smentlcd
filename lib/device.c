@@ -7,11 +7,13 @@
 
 #include <inttypes.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "event.h"
 #include "libusb.h"
 #include "log.h"
+#include "size.h"
 
 #define hotplug_register libusb_hotplug_register_callback
 
@@ -189,4 +191,149 @@ void dev_enable_hotplug(void)
 int dev_enabled(void)
 {
 	return ctx.status & DEV_ENABLED;
+}
+
+int dev_get_vendor_id(const char **ret)
+{
+	static char buf[SZ_16];
+
+	snprintf(buf, sizeof(buf), "0x%04" PRIx16, ctx.dd.idVendor);
+	*ret = buf;
+	return 0;
+}
+
+int dev_get_manufacturer(const char **ret)
+{
+	int err;
+	static char buf[LIBUSB_DEVICE_STRING_BYTES_MAX];
+
+	err = libusb_get_device_string(ctx.dev, LIBUSB_DEVICE_STRING_MANUFACTURER,
+				       buf, sizeof(buf));
+	if (err < 0) {
+		warn_libusb(err, "failed to query manufacturer name");
+		return err;
+	}
+
+	*ret = buf;
+	return 0;
+}
+
+int dev_get_product_id(const char **ret)
+{
+	static char buf[SZ_16];
+
+	snprintf(buf, sizeof(buf), "0x%04" PRIx16, ctx.dd.idProduct);
+	*ret = buf;
+	return 0;
+}
+
+int dev_get_product(const char **ret)
+{
+	int err;
+	static char buf[LIBUSB_DEVICE_STRING_BYTES_MAX];
+
+	err = libusb_get_device_string(ctx.dev, LIBUSB_DEVICE_STRING_PRODUCT,
+				       buf, sizeof(buf));
+	if (err < 0) {
+		warn_libusb(err, "failed to query product name");
+		return err;
+	}
+
+	*ret = buf;
+	return 0;
+}
+
+int dev_get_device_version(const char **ret)
+{
+	static char buf[SZ_16];
+
+	snprintf(buf, sizeof(buf), "%" PRIx16 ".%" PRIx16,
+		 ctx.dd.bcdDevice >> 8, ctx.dd.bcdDevice & 0xff);
+
+	*ret = buf;
+	return 0;
+}
+
+int dev_get_serial_number(const char **ret)
+{
+	int err;
+	static char buf[LIBUSB_DEVICE_STRING_BYTES_MAX];
+
+	err = libusb_get_device_string(ctx.dev, LIBUSB_DEVICE_STRING_SERIAL_NUMBER,
+				       buf, sizeof(buf));
+	if (err < 0) {
+		warn_libusb(err, "failed to query serial number");
+		return err;
+	}
+
+	*ret = buf;
+	return 0;
+}
+
+int dev_get_usb_version(const char **ret)
+{
+	static char buf[SZ_16];
+
+	snprintf(buf, sizeof(buf), "%" PRIx16 ".%" PRIx16, ctx.dd.bcdUSB >> 8,
+		 ctx.dd.bcdUSB & 0xff);
+
+	*ret = buf;
+	return 0;
+}
+
+int dev_get_bus_number(uint8_t *ret)
+{
+	*ret = libusb_get_bus_number(ctx.dev);
+	return 0;
+}
+
+int dev_get_device_address(uint8_t *ret)
+{
+	*ret = libusb_get_device_address(ctx.dev);
+	return 0;
+}
+
+int dev_get_port_path(uint8_t **ret, size_t *len)
+{
+	int err;
+	static uint8_t path[SZ_16];
+
+	err = libusb_get_port_numbers(ctx.dev, path, sizeof(path));
+	if (err < 0) {
+		warn_libusb(err, "failed to query port path");
+		return err;
+	}
+
+	*ret = path;
+	*len = err;
+	return 0;
+}
+
+int dev_get_speed(const char **ret)
+{
+	switch (libusb_get_device_speed(ctx.dev)) {
+	case LIBUSB_SPEED_LOW:
+		*ret = "1.5 Mbit/s";
+		break;
+	case LIBUSB_SPEED_FULL:
+		*ret = "12 Mbit/s";
+		break;
+	case LIBUSB_SPEED_HIGH:
+		*ret = "480 Mbit/s";
+		break;
+	case LIBUSB_SPEED_SUPER:
+		*ret = "5000 Mbit/s";
+		break;
+	case LIBUSB_SPEED_SUPER_PLUS:
+		*ret = "10000 Mbit/s";
+		break;
+	case LIBUSB_SPEED_SUPER_PLUS_X2:
+		*ret = "20000 Mbit/s";
+		break;
+	default:
+		*ret = "unknown";
+		break;
+	}
+
+	return 0;
 }
