@@ -85,13 +85,13 @@ void daemon_exec_req(struct ipc_request *req, struct ipc_response *res)
 int cmd_main_start(int argc, const char **argv)
 {
 	ev_init();
-	ipc_init();
+	ipc_init_d();
 	dev_init();
 
 	dev_setup_pollfd();
 	dev_enable_hotplug();
 
-	ipc_listen();
+	ipc_listen_d();
 	ev_start_loop();
 
 	cc_trap();

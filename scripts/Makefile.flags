@@ -85,7 +85,8 @@ endif
 DAEMON_LDFLAGS += -pthread
 
 ifeq ($(SERVICE),systemd)
-  DAEMON_LDFLAGS += -ludev -lsystemd
+  LDFLAGS += -lsystemd
+  DAEMON_LDFLAGS += -ludev
 endif
 
 build/.flags.%: .force

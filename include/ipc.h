@@ -69,8 +69,8 @@ struct ipc_response {
 	};
 };
 
-void ipc_init(void);
+void ipc_init_d(void);
 
-void ipc_listen(void);
+void ipc_listen_d(void);
 
 #endif /* IPC_H */

@@ -150,7 +150,7 @@ DECLARE_METHOD(stat)
 	return emit_reply(link, &res);
 }
 
-void ipc_init(void)
+void ipc_init_d(void)
 {
 	int err;
 	struct method_map *entry;
@@ -180,7 +180,7 @@ void ipc_init(void)
 		die_errno2(-err, "sd_varlink_server_attach_event() failed");
 }
 
-void ipc_listen(void)
+void ipc_listen_d(void)
 {
 	int ret;
 
