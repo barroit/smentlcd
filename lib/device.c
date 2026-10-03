@@ -293,7 +293,7 @@ int dev_get_device_address(uint8_t *ret)
 	return 0;
 }
 
-int dev_get_port(uint8_t **ret, size_t *len)
+int dev_get_port(uint8_t **ret, uint8_t *len)
 {
 	int err;
 	static uint8_t path[SZ_16];

@@ -68,7 +68,6 @@ DEFINE_METHOD_SCHEME(Stat,
 		     DEFINE_OUTPUT_SCHEME(device_address, SD_VARLINK_INT, 0),
 		     DEFINE_OUTPUT_SCHEME(port, SD_VARLINK_INT,
 					  SD_VARLINK_ARRAY),
-		     DEFINE_OUTPUT_SCHEME(port_count, SD_VARLINK_INT, 0),
 		     DEFINE_OUTPUT_SCHEME(speed, SD_VARLINK_STRING, 0)
 );
 
@@ -106,7 +105,6 @@ static int emit_stat_reply(sd_varlink *link, struct ipc_dev_stat *stat)
 	BUILD_PAIR_UNSIGNED("bus_number", stat->bus_number),
 	BUILD_PAIR_UNSIGNED("device_address", stat->device_address),
 	BUILD_PAIR_BYTE_ARRAY("port", stat->port, stat->port_count),
-	BUILD_PAIR_UNSIGNED("port_count", stat->port_count),
 
 	BUILD_PAIR_STRING("speed", stat->speed));
 }

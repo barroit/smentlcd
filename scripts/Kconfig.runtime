@@ -26,4 +26,12 @@ config LOG_MESSAGE_BUFFER_SIZE
 	int "Message buffer size of logging system"
 	default 2048
 
+config IPC_SOCKET_NAME
+	string "IPC socket name"
+	default "smentlcd.sock"
+
+config IPC_REQ_TIMEOUT
+	int "IPC request timeout"
+	default 39393939
+
 endmenu # Runtime defaults

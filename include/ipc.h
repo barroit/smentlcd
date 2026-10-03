@@ -39,7 +39,8 @@ struct ipc_dev_stat {
 	uint8_t bus_number;
 	uint8_t device_address;
 	uint8_t *port;
-	size_t port_count;
+	uint8_t port_count;
+
 	const char *speed;
 };
 
@@ -47,6 +48,7 @@ enum ipc_request_type {
 	IPC_REQ_FRAME,
 	IPC_REQ_CLEAR,
 	IPC_REQ_STAT,
+	__IPC_REQ_MAX,
 };
 
 enum ipc_response_type {
@@ -57,6 +59,7 @@ enum ipc_response_type {
 
 struct ipc_request {
 	enum ipc_request_type type;
+	const char *method;
 	union {
 	};
 };
@@ -72,5 +75,13 @@ struct ipc_response {
 void ipc_init_d(void);
 
 void ipc_listen_d(void);
+
+void ipc_init_c(void);
+
+void ipc_push_req(enum ipc_request_type type, ...);
+
+void ipc_send_all(void);
+
+void ipc_wait_all(void);
 
 #endif /* IPC_H */
