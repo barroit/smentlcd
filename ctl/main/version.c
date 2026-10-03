@@ -3,15 +3,11 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
-#include <stdio.h>
+#include <stdlib.h>
 
-const char *cmd_main_version_help = "version";
+const char *cmd_main_version_help = "show version information";
 
 int cmd_main_version(int argc, const char **argv)
 {
-	(void)argc;
-	(void)argv;
-
-	puts("smentlcdctl test version");
-	return 0;
+	exit(0);
 }

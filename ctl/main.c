@@ -4,6 +4,7 @@
  */
 
 #include "atexit.h"
+#include "compiler.h"
 #include "parse_argv.h"
 #include "unicode.h"
 
@@ -24,5 +25,7 @@ int cmd_main(int argc, const char **argv)
 	uc_force_utf8_ctype();
 
 	argc = pa_parse_args(argc, argv, opts, usage, 0);
-	return cmd(argc, argv);
+	cmd(argc, argv);
+
+	cc_trap();
 }

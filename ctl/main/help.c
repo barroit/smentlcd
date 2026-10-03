@@ -3,15 +3,11 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
-#include <stdio.h>
+#include <stdlib.h>
 
-const char *cmd_main_help_help = "show the command-tree test commands";
+const char *cmd_main_help_help = "show command usages";
 
 int cmd_main_help(int argc, const char **argv)
 {
-	(void)argc;
-	(void)argv;
-
-	puts("try: smentlcdctl dump remote url");
-	return 0;
+	exit(0);
 }
