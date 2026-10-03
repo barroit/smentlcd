@@ -55,9 +55,8 @@ static void stat_device(struct ipc_response *res)
 	if (!dev_get_device_address(&res->stat.device_address))
 		res->stat.field |= IPC_DEV_STAT_DEVICE_ADDRESS;
 
-	if (!dev_get_port_path(&res->stat.port_path,
-			       &res->stat.port_path_len))
-		res->stat.field |= IPC_DEV_STAT_PORT_PATH;
+	if (!dev_get_port(&res->stat.port, &res->stat.port_count))
+		res->stat.field |= IPC_DEV_STAT_PORT;
 
 	if (!dev_get_speed(&res->stat.speed))
 		res->stat.field |= IPC_DEV_STAT_SPEED;

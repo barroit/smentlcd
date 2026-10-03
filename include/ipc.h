@@ -20,7 +20,7 @@
 #define IPC_DEV_STAT_USB_VERSION	(1u << 6)
 #define IPC_DEV_STAT_BUS_NUMBER		(1u << 7)
 #define IPC_DEV_STAT_DEVICE_ADDRESS	(1u << 8)
-#define IPC_DEV_STAT_PORT_PATH		(1u << 9)
+#define IPC_DEV_STAT_PORT		(1u << 9)
 #define IPC_DEV_STAT_SPEED		(1u << 10)
 
 struct ipc_dev_stat {
@@ -38,8 +38,8 @@ struct ipc_dev_stat {
 
 	uint8_t bus_number;
 	uint8_t device_address;
-	uint8_t *port_path;
-	size_t port_path_len;
+	uint8_t *port;
+	size_t port_count;
 	const char *speed;
 };
 

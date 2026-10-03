@@ -211,7 +211,7 @@ int dev_get_manufacturer(const char **ret)
 				       buf, sizeof(buf));
 	if (err < 0) {
 		warn_libusb(err, "failed to query manufacturer name");
-		return err;
+		return 1;
 	}
 
 	*ret = buf;
@@ -236,7 +236,7 @@ int dev_get_product(const char **ret)
 				       buf, sizeof(buf));
 	if (err < 0) {
 		warn_libusb(err, "failed to query product name");
-		return err;
+		return 1;
 	}
 
 	*ret = buf;
@@ -263,7 +263,7 @@ int dev_get_serial_number(const char **ret)
 				       buf, sizeof(buf));
 	if (err < 0) {
 		warn_libusb(err, "failed to query serial number");
-		return err;
+		return 1;
 	}
 
 	*ret = buf;
@@ -293,7 +293,7 @@ int dev_get_device_address(uint8_t *ret)
 	return 0;
 }
 
-int dev_get_port_path(uint8_t **ret, size_t *len)
+int dev_get_port(uint8_t **ret, size_t *len)
 {
 	int err;
 	static uint8_t path[SZ_16];
@@ -301,7 +301,7 @@ int dev_get_port_path(uint8_t **ret, size_t *len)
 	err = libusb_get_port_numbers(ctx.dev, path, sizeof(path));
 	if (err < 0) {
 		warn_libusb(err, "failed to query port path");
-		return err;
+		return 1;
 	}
 
 	*ret = path;
