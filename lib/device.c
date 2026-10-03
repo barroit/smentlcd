@@ -40,7 +40,7 @@ int dev_wake_libusb(void)
 
 	err = libusb_handle_events_timeout(NULL, &tv);
 	if (err < 0) {
-		error_libusb(-err, "libusb can't handle pending events");
+		error_libusb(err, "libusb can't handle pending events");
 		return -1;
 	}
 
