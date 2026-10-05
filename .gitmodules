@@ -17,3 +17,7 @@
 [submodule "libdeflate"]
 	path = libdeflate
 	url = git@github.com:ebiggers/libdeflate.git
+
+[submodule "stb"]
+	path = stb
+	url = git@github.com:nothings/stb.git

@@ -10,11 +10,13 @@
       "**/libdeflate": true,
       "**/libusb": true,
       "**/tapview": true,
+      "**/stb": true,
    },
    "git.ignoredRepositories": [
       "kconfiglib",
       "libdeflate",
       "libusb",
+      "stb",
       "tapview",
    ],
    "C_Cpp.default.cStandard": "gnu17",
@@ -22,6 +24,7 @@
       "${workspaceFolder}/include",
       "${workspaceFolder}/t/unit/include",
       "${workspaceFolder}/libusb/libusb",
+      "${workspaceFolder}/stb",
    ],
    "C_Cpp.default.forcedInclude": [
       "${workspaceFolder}/include/generated/build.h",
