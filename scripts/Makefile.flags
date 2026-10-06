@@ -72,7 +72,8 @@ CFLAGS += -Wno-parentheses
 
 CFLAGS += -iquote include
 
-CFLAGS += -isystem libusb/libusb \
+CFLAGS += -isystem libdeflate \
+	  -isystem libusb/libusb \
 	  -isystem stb
 
 CFLAGS += -include include/generated/config.h

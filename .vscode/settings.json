@@ -21,10 +21,11 @@
    ],
    "C_Cpp.default.cStandard": "gnu17",
    "C_Cpp.default.includePath": [
+      "${workspaceFolder}/libdeflate",
       "${workspaceFolder}/include",
-      "${workspaceFolder}/t/unit/include",
       "${workspaceFolder}/libusb/libusb",
       "${workspaceFolder}/stb",
+      "${workspaceFolder}/t/unit/include",
    ],
    "C_Cpp.default.forcedInclude": [
       "${workspaceFolder}/include/generated/build.h",

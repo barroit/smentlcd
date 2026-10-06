@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 build/daemon/%/entry: $(lib-obj-y) $(daemon-obj-y) \
-		      build/libusb.a \
-		      build/libdeflate.a
+		      build/libusb.a
 	mkdir -p $(@D)
 	$(CC) $(LDFLAGS) \
 	      $(filter %.o,$^) \
