@@ -6,12 +6,15 @@
 #ifndef XALLOC_H
 #define XALLOC_H
 
+#include <sys/types.h>
+
 #include "attr.h"
 #include "calc.h"
 #include "compiler.h"
 
 #define xcalloc(...)       __xalloc(calloc, __VA_ARGS__)
 #define xmalloc(...)       __xalloc(malloc, __VA_ARGS__)
+#define xmmap(...)         __xalloc(mmap, __VA_ARGS__)
 #define xrealloc(...)      __xalloc(realloc, __VA_ARGS__)
 #define xreallocarray(...) __xalloc(reallocarray, __VA_ARGS__)
 #define xstrdup(...)       __xalloc(strdup, __VA_ARGS__)
@@ -33,6 +36,9 @@ void *__xcalloc(const char *file, int line, const char *func, size_t nmemb,
 		size_t size);
 
 void *__xmalloc(const char *file, int line, const char *func, size_t size);
+
+void *__xmmap(const char *file, int line, const char *func, void *addr,
+	      size_t len, int prot, int flags, int fildes, off_t off);
 
 void *__xrealloc(const char *file, int line, const char *func, void *ptr,
 		 size_t size);
