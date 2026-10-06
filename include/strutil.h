@@ -10,4 +10,6 @@ const char *str_skip(const char *s1, const char *s2);
 
 int str_skip2(const char *s1, const char *s2, const char **res);
 
+const char *str_seek_suffix(const char *filename, char after);
+
 #endif /* STRUTIL_H */

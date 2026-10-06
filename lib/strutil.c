@@ -4,6 +4,7 @@
  */
 
 #include <stddef.h>
+#include <string.h>
 
 #include "strutil.h"
 
@@ -26,4 +27,15 @@ int str_skip2(const char *s1, const char *s2, const char **__res)
 
 	*__res = res;
 	return 0;
+}
+
+const char *str_seek_suffix(const char *str, char after)
+{
+	const char *ret;
+
+	ret = strrchr(str, after);
+	if (!ret[0] || !ret[1])
+		return NULL;
+
+	return &ret[1];
 }
