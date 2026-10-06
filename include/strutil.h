@@ -6,8 +6,8 @@
 #ifndef STRUTIL_H
 #define STRUTIL_H
 
-const char *strskip(const char *s1, const char *s2);
+const char *str_skip(const char *s1, const char *s2);
 
-int strskip2(const char *s1, const char *s2, const char **res);
+int str_skip2(const char *s1, const char *s2, const char **res);
 
 #endif /* STRUTIL_H */

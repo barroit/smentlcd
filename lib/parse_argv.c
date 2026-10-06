@@ -398,8 +398,8 @@ static enum pa_res parse_option(struct pa_ctx *ctx, const char *option)
 	struct abbrev abbrev = { 0 };
 	struct abbrev ambigu = { 0 };
 
-	if (!strskip2(cli_name, "no-", &cli_name)) {
-		if (!strskip2(cli_name, "no-", &cli_name))
+	if (!str_skip2(cli_name, "no-", &cli_name)) {
+		if (!str_skip2(cli_name, "no-", &cli_name))
 			cli_flags |= OPT_NO_NO;
 		else
 			cli_flags |= OPT_UNSET;
@@ -418,7 +418,7 @@ static enum pa_res parse_option(struct pa_ctx *ctx, const char *option)
 		if (opt->class != PA_OPTC_OPTION || !opt->name)
 			continue;
 
-		if (!strskip2(opt_name, "no-", &opt_name))
+		if (!str_skip2(opt_name, "no-", &opt_name))
 			opt_flags |= OPT_UNSET;
 		else if (cli_flags & OPT_NO_NO)
 			continue;
@@ -428,7 +428,7 @@ static enum pa_res parse_option(struct pa_ctx *ctx, const char *option)
 		if (flags & OPT_UNSET && opt->flags & PA_OPT_NO_NEG)
 			continue;
 
-		if (!strskip2(cli_name, opt_name, &arg)) {
+		if (!str_skip2(cli_name, opt_name, &arg)) {
 			if (__parse_option(ctx, opt, arg, flags))
 				continue;
 			return PARSE_CONTINUE;
@@ -437,7 +437,7 @@ static enum pa_res parse_option(struct pa_ctx *ctx, const char *option)
 		if (!strncmp(opt_name, cli_name, sep - cli_name))
 			mark_abbrev(opt, flags, &abbrev, &ambigu);
 
-		if (!(opt->flags & PA_OPT_NO_NEG) && strskip("no-", option))
+		if (!(opt->flags & PA_OPT_NO_NEG) && str_skip("no-", option))
 			mark_abbrev(opt, opt_flags ^ OPT_UNSET, &abbrev,
 				    &ambigu);
 	}

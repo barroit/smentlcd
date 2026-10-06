@@ -7,7 +7,7 @@
 
 #include "strutil.h"
 
-const char *strskip(const char *s1, const char *s2)
+const char *str_skip(const char *s1, const char *s2)
 {
 	do {
 		if (!s2[0])
@@ -17,9 +17,9 @@ const char *strskip(const char *s1, const char *s2)
 	return NULL;
 }
 
-int strskip2(const char *s1, const char *s2, const char **__res)
+int str_skip2(const char *s1, const char *s2, const char **__res)
 {
-	const char *res = strskip(s1, s2);
+	const char *res = str_skip(s1, s2);
 
 	if (res == NULL)
 		return -1;
