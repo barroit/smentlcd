@@ -34,7 +34,7 @@ const char *str_seek_suffix(const char *str, char after)
 	const char *ret;
 
 	ret = strrchr(str, after);
-	if (!ret[0] || !ret[1])
+	if (!ret || !ret[0] || !ret[1])
 		return NULL;
 
 	return &ret[1];
