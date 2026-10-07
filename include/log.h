@@ -18,6 +18,7 @@ typedef void (*log_vwritef_fn)(int fd, const char *prefix, const char *hint,
 
 extern char *strerror(int errnum);
 extern const char *libusb_strerror(int errcode);
+extern const char *stbi_failure_reason(void);
 
 #define record(fmt, ...) __log_record(__func__, fmt, ##__VA_ARGS__)
 
@@ -38,6 +39,7 @@ extern const char *libusb_strerror(int errcode);
 #define die_errno2(e, fmt, ...) __log_die(strerror(e), fmt, ##__VA_ARGS__)
 #define die_libusb(e, fmt, ...) \
 	__log_die(libusb_strerror(e), fmt, ##__VA_ARGS__)
+#define die_stbi(fmt, ...) __log_die(stbi_failure_reason(), fmt, ##__VA_ARGS__)
 
 #define bug(fmt, ...)							\
 	__log_bug("%s:%d,%s(): " fmt, __FILE__, __LINE__, __func__,	\

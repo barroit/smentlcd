@@ -34,4 +34,37 @@ config IPC_REQ_TIMEOUT
 	int "IPC request timeout"
 	default 39393939
 
+config IMAGE_WIDTH_MAX
+	int "Maximum width of image"
+	default 640
+
+config IMAGE_HEIGHT_MAX
+	int "Maximum height of image"
+	default 150
+
+choice
+	prompt "Image compression level"
+	default IMAGE_COMPRESS_MEDIUM
+
+config IMAGE_COMPRESS_LOW
+	bool "Low"
+
+config IMAGE_COMPRESS_MEDIUM
+	bool "Medium"
+
+config IMAGE_COMPRESS_HIGH
+	bool "High"
+
+config IMAGE_COMPRESS_MAX
+	bool "Maximum"
+
+endchoice
+
+config IMAGE_COMPRESS_LEVEL
+	int
+	default 1 if IMAGE_COMPRESS_LOW
+	default 6 if IMAGE_COMPRESS_MEDIUM
+	default 9 if IMAGE_COMPRESS_HIGH
+	default 12 if IMAGE_COMPRESS_MAX
+
 endmenu # Runtime defaults
