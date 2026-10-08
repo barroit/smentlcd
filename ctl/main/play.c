@@ -10,6 +10,7 @@
 #include "image.h"
 #include "ipc.h"
 #include "log.h"
+#include "packet.h"
 #include "parse_argv.h"
 
 static const char *usage[] = {
@@ -24,6 +25,7 @@ int cmd_main_play(int argc, const char **argv)
 	struct image image = {
 		.type = IMAGE_UNKNOWN,
 	};
+	struct packet packet = { 0 };
 	struct pa_opt opts[] = {
 		PA_OPT_CMDMODE("png", 0, &image.type, IMAGE_PNG,
 			       "treat image as PNG"),
@@ -42,6 +44,12 @@ int cmd_main_play(int argc, const char **argv)
 
 	image_load(&image, argv[0]);
 	image_rgb888_to_bgr565(&image);
+
+	packet_alloc_write(&packet, &image);
+	packet_compress_image(&packet, &image);
+
+	image_release(&image);
+	packet_populate_header(&packet);
 
 	exit(0);
 }

@@ -65,7 +65,8 @@ lib-obj-y += build/lib/atexit.o \
 	     build/lib/unicode_width.o \
 	     build/lib/xalloc.o
 
-ctl-obj-y += build/lib/image.o
+ctl-obj-y += build/lib/image.o \
+	     build/lib/packet.o
 
 daemon-obj-y += build/lib/device.o \
 		build/lib/log_nb.o

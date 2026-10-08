@@ -67,4 +67,12 @@ config IMAGE_COMPRESS_LEVEL
 	default 9 if IMAGE_COMPRESS_HIGH
 	default 12 if IMAGE_COMPRESS_MAX
 
+config PACKET_HEADER_SIZE
+	int "Size of packet header"
+	default 512
+
+config PACKET_FRAME_SIZE
+	int "Size of each frame for packet"
+	default 65535
+
 endmenu # Runtime defaults
