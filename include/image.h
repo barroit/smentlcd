@@ -7,6 +7,7 @@
 #define IMAGE_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 enum image_type {
 	IMAGE_UNKNOWN,
@@ -15,12 +16,25 @@ enum image_type {
 	IMAGE_GIF,
 };
 
-void image_init(void);
+struct image {
+	enum image_type type;
+	uint8_t *buf;
 
-void image_load(const char *filename, enum image_type type_hint);
+	int width;
+	int height;
+	int channels;
 
-size_t image_frame_size(void);
+	int *delays;
+	int count;
+};
 
-void image_rgb888_to_bgr565(void);
+void image_load(struct image *image, const char *filename);
+
+static inline size_t image_frame_size(struct image *image)
+{
+	return image->width * image->height * image->channels;
+}
+
+void image_rgb888_to_bgr565(struct image *image);
 
 #endif /* IMAGE_H */

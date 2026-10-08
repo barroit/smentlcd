@@ -16,30 +16,13 @@
 #include "stb_image.h"
 #include "strutil.h"
 #include "xalloc.h"
-#include "libdeflate.h"
 
 #define stbi_load     stbi_load_from_memory
 #define stbi_load_gif stbi_load_gif_from_memory
 
-
-struct image {
-	enum image_type type;
-	void *buf;
-
-	int width;
-	int height;
-	int channels;
-
-	int *delays;
-	int frame_count;
+static int delays_fb[] = {
+	maxof(typeof(*delays_fb)),
 };
-
-struct image_ctx {
-	struct image image;
-	struct libdeflate_compressor *compressor;
-};
-
-static struct image_ctx ctx;
 
 static enum image_type match_image_type_nocase(const char *suffix)
 {
@@ -91,30 +74,36 @@ static enum image_type resolve_type_nocase(const char *filename)
 	die("unable to probe image type for %s", filename);
 }
 
-void image_init(void)
+static void load_single_frame(struct image *image, void *buf, size_t size)
 {
-	struct libdeflate_compressor *compressor;
-	int level = CONFIG_IMAGE_COMPRESS_LEVEL;
+	int __channels;
 
-	compressor = libdeflate_alloc_compressor(level);
-	if (!compressor)
-		die("can't allocate libdeflate compressor");
-
-	ctx.compressor = compressor;
+	image->buf = stbi_load_from_memory(buf, size, &image->width,
+					   &image->height, &__channels,
+					   STBI_rgb);
+	image->count = 1;
+	image->delays = delays_fb;
 }
 
-void image_load(const char *filename, enum image_type type_hint)
+static void load_multi_frame(struct image *image, void *buf, size_t size)
+{
+	int __channels;
+
+	image->buf = stbi_load_gif_from_memory(buf, size, &image->delays,
+					       &image->width, &image->height,
+					       &image->count, &__channels,
+					       STBI_rgb);
+}
+
+void image_load(struct image *image, const char *filename)
 {
 	int err;
 	int fd;
 	struct stat st;
 	void *buf;
-	int original_channels;
 
-	if (type_hint != IMAGE_UNKNOWN)
-		ctx.image.type = type_hint;
-	else
-		ctx.image.type = resolve_type_nocase(filename);
+	if (image->type == IMAGE_UNKNOWN)
+		image->type = resolve_type_nocase(filename);
 
 	fd = open(filename, O_RDONLY);
 	if (fd == -1)
@@ -128,48 +117,34 @@ void image_load(const char *filename, enum image_type type_hint)
 		die("image %s is not regular file", filename);
 
 	buf = xmmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-	switch (ctx.image.type) {
+	switch (image->type) {
 	case IMAGE_PNG:
 	case IMAGE_JPEG:
-		ctx.image.buf = stbi_load(buf, st.st_size, &ctx.image.width,
-					  &ctx.image.height,
-					  &original_channels, STBI_rgb);
-		ctx.image.frame_count = 1;
+		load_single_frame(image, buf, st.st_size);
 		break;
 	case IMAGE_GIF:
-		ctx.image.buf = stbi_load_gif(buf, st.st_size,
-					      &ctx.image.delays,
-					      &ctx.image.width,
-					      &ctx.image.height,
-					      &ctx.image.frame_count,
-					      &original_channels, STBI_rgb);
+		load_multi_frame(image, buf, st.st_size);
 	}
 
-	if (!ctx.image.buf)
+	if (!image->buf)
 		die_stbi("can't process image");
 
-	if (ctx.image.width != CONFIG_IMAGE_WIDTH_MAX ||
-	    ctx.image.height != CONFIG_IMAGE_HEIGHT_MAX)
+	if (image->width != CONFIG_IMAGE_WIDTH_MAX ||
+	    image->height != CONFIG_IMAGE_HEIGHT_MAX)
 		die("image pixels must be 640 x 150");
 
-	ctx.image.channels = STBI_rgb;
+	image->channels = STBI_rgb;
 
 	close(fd);
 	munmap(buf, st.st_size);
 }
 
-size_t image_frame_size(void)
-{
-	return ctx.image.width * ctx.image.height * ctx.image.channels;
-}
-
-void image_rgb888_to_bgr565(void)
+void image_rgb888_to_bgr565(struct image *image)
 {
 	size_t idx;
-	size_t pixels = ctx.image.width * ctx.image.height *
-			ctx.image.frame_count;
-	uint8_t *src = ctx.image.buf;
-	uint8_t *dst = ctx.image.buf;
+	size_t pixels = image->width * image->height * image->count;
+	uint8_t *src = image->buf;
+	uint8_t *dst = image->buf;
 
 	for (idx = 0; idx < pixels; idx++) {
 		uint8_t r = src[0];
@@ -188,5 +163,5 @@ void image_rgb888_to_bgr565(void)
 		dst += 2;
 	}
 
-	ctx.image.channels = 2;
+	image->channels = 2;
 }
