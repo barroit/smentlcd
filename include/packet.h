@@ -7,7 +7,6 @@
 #define PACKET_H
 
 #include <stddef.h>
-#include <stdint.h>
 
 struct image;
 struct libdeflate_compressor;
@@ -22,7 +21,7 @@ struct packet {
 	struct libdeflate_compressor *compressor;
 };
 
-void packet_alloc_write(struct packet *packet, struct image *image);
+void packet_alloc_buffer(struct packet *packet, struct image *image);
 
 void packet_compress_image(struct packet *packet, struct image *image);
 

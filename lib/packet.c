@@ -15,22 +15,11 @@
 #include "libdeflate.h"
 #include "image.h"
 #include "log.h"
+#include "playback.h"
 #include "rio.h"
 #include "xalloc.h"
 
 #define SHM_NAME "/smentlcd_packet"
-
-struct frame {
-	uint8_t buf[CONFIG_PACKET_HEADER_SIZE + CONFIG_PACKET_FRAME_SIZE];
-	size_t size;
-	unsigned int delay;
-};
-
-struct playback {
-	unsigned int count;
-	unsigned int index;
-	struct frame frames[];
-};
 
 static void drop_shm(void)
 {
@@ -55,7 +44,7 @@ static void packet_open_shm(struct packet *packet, size_t count)
 		die_errno("can't set size for %s", SHM_NAME);
 }
 
-void packet_alloc_write(struct packet *packet, struct image *image)
+void packet_alloc_buffer(struct packet *packet, struct image *image)
 {
 	packet_open_shm(packet, image->count);
 	packet->buf = xmmap(NULL, packet->nalloc, PROT_READ | PROT_WRITE,

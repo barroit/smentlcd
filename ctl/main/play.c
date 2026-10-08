@@ -45,7 +45,7 @@ int cmd_main_play(int argc, const char **argv)
 	image_load(&image, argv[0]);
 	image_rgb888_to_bgr565(&image);
 
-	packet_alloc_write(&packet, &image);
+	packet_alloc_buffer(&packet, &image);
 	packet_compress_image(&packet, &image);
 	packet_populate_header(&packet);
 
