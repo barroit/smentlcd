@@ -87,13 +87,14 @@ static void load_single_frame(struct image *image, void *buf, size_t size)
 static void load_multi_frame(struct image *image, void *buf, size_t size)
 {
 	int __channels;
+	int *__delays = NULL;
 
-	image->buf = stbi_load_gif_from_memory(buf, size,
-					       (int **)&image->delays,
+	image->buf = stbi_load_gif_from_memory(buf, size, &__delays,
 					       (int *)&image->width,
 					       (int *)&image->height,
 					       (int *)&image->count,
 					       &__channels, STBI_rgb);
+	image->delays = (unsigned int *)__delays;
 }
 
 void image_load(struct image *image, const char *filename)
@@ -116,6 +117,10 @@ void image_load(struct image *image, const char *filename)
 
 	if (!S_ISREG(st.st_mode))
 		die("image %s is not regular file", filename);
+
+	if (st.st_size > maxof(int))
+		die("image %s exceeds %u bytes", filename,
+		    (unsigned int)maxof(int));
 
 	buf = xmmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 	switch (image->type) {
