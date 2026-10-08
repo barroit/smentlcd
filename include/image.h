@@ -20,12 +20,12 @@ struct image {
 	enum image_type type;
 	uint8_t *buf;
 
-	int width;
-	int height;
-	int channels;
+	unsigned int width;
+	unsigned int height;
+	unsigned int channels;
 
-	int *delays;
-	int count;
+	unsigned int count;
+	unsigned int *delays;
 };
 
 void image_load(struct image *image, const char *filename);

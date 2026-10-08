@@ -20,10 +20,6 @@
 #define stbi_load     stbi_load_from_memory
 #define stbi_load_gif stbi_load_gif_from_memory
 
-static int delays_fb[] = {
-	maxof(typeof(*delays_fb)),
-};
-
 static enum image_type match_image_type_nocase(const char *suffix)
 {
 	unsigned int table_idx;
@@ -77,22 +73,27 @@ static enum image_type resolve_type_nocase(const char *filename)
 static void load_single_frame(struct image *image, void *buf, size_t size)
 {
 	int __channels;
+	static unsigned int delays[] = {
+		maxof(typeof(*delays)),
+	};
 
-	image->buf = stbi_load_from_memory(buf, size, &image->width,
-					   &image->height, &__channels,
+	image->buf = stbi_load_from_memory(buf, size, (int *)&image->width,
+					   (int *)&image->height, &__channels,
 					   STBI_rgb);
 	image->count = 1;
-	image->delays = delays_fb;
+	image->delays = delays;
 }
 
 static void load_multi_frame(struct image *image, void *buf, size_t size)
 {
 	int __channels;
 
-	image->buf = stbi_load_gif_from_memory(buf, size, &image->delays,
-					       &image->width, &image->height,
-					       &image->count, &__channels,
-					       STBI_rgb);
+	image->buf = stbi_load_gif_from_memory(buf, size,
+					       (int **)&image->delays,
+					       (int *)&image->width,
+					       (int *)&image->height,
+					       (int *)&image->count,
+					       &__channels, STBI_rgb);
 }
 
 void image_load(struct image *image, const char *filename)
