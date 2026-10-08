@@ -61,6 +61,7 @@ struct ipc_request {
 	enum ipc_request_type type;
 	const char *method;
 	union {
+		int fd;
 	};
 };
 

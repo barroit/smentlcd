@@ -36,7 +36,7 @@ int cmd_main_play(int argc, const char **argv)
 		PA_OPT_END(),
 	};
 
-	// ipc_init_c();
+	ipc_init_c();
 
 	argc = pa_parse_args(argc, argv, opts, usage, 0);
 	if (argc != 1)
@@ -47,9 +47,11 @@ int cmd_main_play(int argc, const char **argv)
 
 	packet_alloc_write(&packet, &image);
 	packet_compress_image(&packet, &image);
-
-	image_release(&image);
 	packet_populate_header(&packet);
+
+	ipc_push_req(IPC_REQ_FRAME, packet.fd);
+	ipc_send_all();
+	ipc_wait_all();
 
 	exit(0);
 }

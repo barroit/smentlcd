@@ -9,6 +9,7 @@
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-json.h>
 #include <systemd/sd-varlink.h>
+#include <unistd.h>
 
 #include "event.h"
 #include "log.h"
@@ -16,7 +17,6 @@
 void daemon_exec_req(struct ipc_request *req, struct ipc_response *res);
 
 #define DEFINE_METHOD_SCHEME static SD_VARLINK_DEFINE_METHOD
-#define DEFINE_INPUT_SCHEME  SD_VARLINK_DEFINE_INPUT
 #define DEFINE_OUTPUT_SCHEME SD_VARLINK_DEFINE_OUTPUT
 
 #define DEFINE_ERROR_SCHEME static SD_VARLINK_DEFINE_ERROR
@@ -47,8 +47,7 @@ struct method_map {
 	sd_varlink_method_t method;
 };
 
-DEFINE_METHOD_SCHEME(Frame,
-		     DEFINE_INPUT_SCHEME(fd, SD_VARLINK_INT, 0));
+DEFINE_METHOD_SCHEME(Frame);
 
 DEFINE_METHOD_SCHEME(Clear);
 
@@ -129,7 +128,21 @@ static int emit_reply(sd_varlink *link, struct ipc_response *res)
 
 DECLARE_METHOD(frame)
 {
-	return sd_varlink_reply(link, NULL);
+	struct ipc_request req = {
+		.type = IPC_REQ_FRAME,
+	};
+	struct ipc_response res = { 0 };
+
+	req.fd = sd_varlink_take_fd(link, 0);
+	if (req.fd < 0)
+		return emit_error_reply(link,
+					"can't receive frame file descriptor");
+
+	record("running");
+	daemon_exec_req(&req, &res);
+
+	close(req.fd);
+	return emit_reply(link, &res);
 }
 
 DECLARE_METHOD(clear)

@@ -5,6 +5,7 @@
 
 #include "ipc.h"
 
+#include <stdarg.h>
 #include <stdlib.h>
 #include <systemd/sd-path.h>
 #include <systemd/sd-varlink.h>
@@ -170,7 +171,6 @@ static int recv_reply(sd_varlink *link, sd_json_variant *reply,
 	switch (task->req.type) {
 	case IPC_REQ_STAT:
 		recv_stat_reply(task, reply);
-		break;
 	}
 
 	list_del(&task->list);
@@ -193,6 +193,11 @@ void ipc_init_c(void)
 		die_errno2(-err, "can't connect to daemon via socket %s",
 			   ctx.socket);
 
+	err = sd_varlink_set_allow_fd_passing_output(ctx.link, 1);
+	if (err < 0)
+		die_errno2(-err,
+			   "can't enable outgoing file descriptor passing");
+
 	err = sd_varlink_bind_reply(ctx.link, recv_reply);
 	if (err < 0)
 		die_errno2(-err, "can't bind varlink reply callback");
@@ -204,6 +209,7 @@ void ipc_push_req(enum ipc_request_type type, ...)
 {
 	struct ipc_task *task;
 	static size_t cnt;
+	va_list ap;
 
 	task = xmalloc(sizeof(*task));
 	task->req.type = type;
@@ -211,13 +217,25 @@ void ipc_push_req(enum ipc_request_type type, ...)
 	task->sent.tv_sec = 39;
 	task->sent.tv_nsec = 39;
 
+	va_start(ap, type);
 	switch (type) {
-	case IPC_REQ_STAT:
-		;
+	case IPC_REQ_FRAME:
+		task->req.fd = va_arg(ap, int);
 	}
+	va_end(ap);
 
 	list_add_tail(&task->list, &ctx.task_queue);
 	cnt++;
+}
+
+static void send_frame_fd(struct ipc_task *task)
+{
+	int err;
+
+	err = sd_varlink_push_fd(ctx.link, task->req.fd);
+	if (err < 0)
+		die_errno2(-err, "can't send file descriptor for %s",
+			   method_table[task->req.type]);
 }
 
 void ipc_send_all(void)
@@ -227,6 +245,11 @@ void ipc_send_all(void)
 	list_foreach_entry(task, &ctx.task_queue, list) {
 		int err;
 		const char *method = method_table[task->req.type];
+
+		switch (task->req.type) {
+		case IPC_REQ_FRAME:
+			send_frame_fd(task);
+		}
 
 		err = sd_varlink_invoke(ctx.link, method, NULL);
 		if (err < 0)
