@@ -30,6 +30,8 @@ struct image {
 
 void image_load(struct image *image, const char *filename);
 
+void image_release(struct image *image);
+
 static inline size_t image_frame_size(struct image *image)
 {
 	return image->width * image->height * image->channels;

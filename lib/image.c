@@ -140,6 +140,14 @@ void image_load(struct image *image, const char *filename)
 	munmap(buf, st.st_size);
 }
 
+void image_release(struct image *image)
+{
+	stbi_image_free(image->buf);
+
+	if (image->type == IMAGE_GIF)
+		stbi_image_free(image->delays);
+}
+
 void image_rgb888_to_bgr565(struct image *image)
 {
 	size_t idx;
