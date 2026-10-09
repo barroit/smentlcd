@@ -181,7 +181,7 @@ void dev_enable_hotplug(void)
 			       LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED |
 			       LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
 			       LIBUSB_HOTPLUG_ENUMERATE,
-			       CONFIG_SMENT_VID, CONFIG_SMENT_PID,
+			       CONFIG_DEVICE_VID, CONFIG_DEVICE_PID,
 			       LIBUSB_HOTPLUG_MATCH_ANY,
 			       handle_hotplug, NULL, NULL);
 	if (err)

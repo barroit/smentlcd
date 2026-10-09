@@ -6,11 +6,11 @@ config UTF8_LOCALE
 	string "Default LC_CTYPE"
 	default "$(utf8-locale)"
 
-config SMENT_VID
+config DEVICE_VID
 	int "SpaceMouse Enterprice vendor ID"
 	default 0x$(cut,$(first-line,device_info),1)
 
-config SMENT_PID
+config DEVICE_PID
 	int "SpaceMouse Enterprice product ID"
 	default 0x$(cut,$(first-line,device_info),2)
 
