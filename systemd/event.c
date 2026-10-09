@@ -15,38 +15,37 @@
 #include "xalloc.h"
 #include "size.h"
 
-struct ev_once_queue {
-	ev_handler_fn buf[SZ_16];
+struct once_queue {
+	event_handler_fn handler[SZ_16];
 	size_t head;
 	size_t tail;
 };
 
-struct ev_ctx {
+struct event_ctx {
 	struct sd_event *event;
 
-	struct ev_once_queue once_queue;
+	struct once_queue once_queue;
 };
 
 int dev_wake_libusb(void);
 
-static struct ev_ctx ctx;
+static struct event_ctx ctx;
 
-struct sd_event *ev_current;
-
-void ev_init(void)
+void event_init(void)
 {
 	int err;
-
-	assert(!ctx.event);
 
 	err = sd_event_default(&ctx.event);
 	if (err < 0)
 		die_errno2(-err, "sd_event_default() failed");
-
-	ev_current = ctx.event;
 }
 
-void ev_start_loop(void)
+void *event_current(void)
+{
+	return ctx.event;
+}
+
+void event_start_loop(void)
 {
 	int ret;
 
@@ -61,13 +60,13 @@ static int handle_once(sd_event_source *src, void *userdata)
 
 	tail = ctx.once_queue.tail % SZ_16;
 	ctx.once_queue.tail++;
-	ctx.once_queue.buf[tail]();
+	ctx.once_queue.handler[tail]();
 
 	sd_event_source_unref(src);
 	return 0;
 }
 
-int ev_sched_once(ev_handler_fn handler)
+int event_sched_once(event_handler_fn handler)
 {
 	int err;
 	size_t head;
@@ -77,12 +76,12 @@ int ev_sched_once(ev_handler_fn handler)
 
 	head = ctx.once_queue.head % SZ_16;
 	ctx.once_queue.head++;
-	ctx.once_queue.buf[head] = handler;
+	ctx.once_queue.handler[head] = handler;
 	err = sd_event_add_defer(ctx.event, &src, handle_once, NULL);
 	if (err < 0) {
 		ctx.once_queue.head--;
-		error_errno2(-err, "sd_event_add_defer() failed");
-		return 1;
+		error_errno2(-err, "can't schedule event");
+		return -1;
 	}
 
 	return 0;
@@ -94,7 +93,7 @@ static int handle_event_io(sd_event_source *src, int fd, uint32_t revents,
 	return dev_wake_libusb();
 }
 
-void *ev_watch_pollfd(size_t nalloc, int fd, short events)
+void *event_watch_pollfd(size_t nalloc, int fd, short events)
 {
 	int err;
 	char *buf;
@@ -123,7 +122,7 @@ void *ev_watch_pollfd(size_t nalloc, int fd, short events)
 	return buf;
 }
 
-void ev_unwatch_pollfd(void *src)
+void event_unwatch_pollfd(void *src)
 {
 	sd_event_source_unref(*(struct sd_event_source **)src);
 }

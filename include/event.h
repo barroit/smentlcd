@@ -8,20 +8,18 @@
 
 #include <stddef.h>
 
-struct sd_event;
+typedef void (*event_handler_fn)(void);
 
-typedef void (*ev_handler_fn)(void);
+void event_init(void);
 
-extern struct sd_event *ev_current;
+void *event_current(void);
 
-void ev_init(void);
+void event_start_loop(void);
 
-void ev_start_loop(void);
+int event_sched_once(event_handler_fn handler);
 
-int ev_sched_once(ev_handler_fn handler);
+void *event_watch_pollfd(size_t nalloc, int fd, short events);
 
-void *ev_watch_pollfd(size_t nalloc, int fd, short events);
-
-void ev_unwatch_pollfd(void *src);
+void event_unwatch_pollfd(void *src);
 
 #endif /* EVENT_H */

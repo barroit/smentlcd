@@ -66,7 +66,7 @@ static void watch_pollfd(int fd, short events, void *userdata)
 	struct event_source *ev_src;
 	size_t nalloc = cc_offsetof(struct event_source, data);
 
-	ev_src = ev_watch_pollfd(nalloc, fd, events);
+	ev_src = event_watch_pollfd(nalloc, fd, events);
 	if (!ev_src)
 		return;
 
@@ -80,7 +80,7 @@ static void unwatch_pollfd(int fd, void *userdata)
 
 	list_foreach_entry(ev_src, &ctx.ev_src_list, list) {
 		if (ev_src->fd == fd) {
-			ev_unwatch_pollfd(ev_src->data);
+			event_unwatch_pollfd(ev_src->data);
 			list_del(&ev_src->list);
 
 			free(ev_src);
@@ -153,7 +153,7 @@ static int handle_hotplug(struct libusb_context *libusb,
 			return 0;
 		}
 
-		err = ev_sched_once(claim_lcd_interface);
+		err = event_sched_once(claim_lcd_interface);
 		if (err) {
 			disable_device();
 			break;

@@ -168,8 +168,6 @@ void ipc_init_d(void)
 	int err;
 	struct method_map *entry;
 
-	assert(!ctx.server);
-
 	err = sd_varlink_server_new(&ctx.server,
 				    SD_VARLINK_SERVER_ALLOW_FD_PASSING_INPUT);
 	if (err)
@@ -188,7 +186,7 @@ void ipc_init_d(void)
 				   "sd_varlink_server_bind_method() failed");
 	}
 
-	err = sd_varlink_server_attach_event(ctx.server, ev_current, 0);
+	err = sd_varlink_server_attach_event(ctx.server, event_current(), 0);
 	if (err)
 		die_errno2(-err, "sd_varlink_server_attach_event() failed");
 }
