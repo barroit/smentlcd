@@ -17,7 +17,6 @@ struct frame {
 
 struct playback {
 	unsigned int count;
-	unsigned int index;
 	struct frame frames[];
 };
 

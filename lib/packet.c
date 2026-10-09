@@ -52,7 +52,6 @@ void packet_alloc_buffer(struct packet *packet, struct image *image)
 
 	packet->playback = packet->buf;
 	packet->playback->count = image->count;
-	packet->playback->index = 0;
 }
 
 static void alloc_compressor(struct packet *packet)
