@@ -7,11 +7,11 @@ config UTF8_LOCALE
 	default "$(utf8-locale)"
 
 config DEVICE_VID
-	int "SpaceMouse Enterprice vendor ID"
+	hex "SpaceMouse Enterprice vendor ID"
 	default 0x$(cut,$(first-line,device_info),1)
 
 config DEVICE_PID
-	int "SpaceMouse Enterprice product ID"
+	hex "SpaceMouse Enterprice product ID"
 	default 0x$(cut,$(first-line,device_info),2)
 
 config RECORD_SHOW_TIMESTAMP
