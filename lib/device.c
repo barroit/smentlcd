@@ -22,7 +22,7 @@
 
 struct dev_ctx {
 	uint32_t status;
-	struct list_head ev_src_list;
+	struct list_head events;
 
 	struct libusb_device *dev;
 	struct libusb_device_handle *dh;
@@ -51,7 +51,7 @@ void dev_init(void)
 {
 	int err;
 
-	list_head_init(&ctx.ev_src_list);
+	list_head_init(&ctx.events);
 
 	err = libusb_init_context(NULL, NULL, 0);
 	if (err < 0)
@@ -63,27 +63,27 @@ void dev_init(void)
 
 static void watch_pollfd(int fd, short events, void *userdata)
 {
-	struct event_source *ev_src;
+	struct event_source *event;
 	size_t nalloc = cc_offsetof(struct event_source, data);
 
-	ev_src = event_watch_pollfd(nalloc, fd, events);
-	if (!ev_src)
+	event = event_watch_pollfd(nalloc, fd, events);
+	if (!event)
 		return;
 
-	ev_src->fd = fd;
-	list_add_tail(&ev_src->list, &ctx.ev_src_list);
+	event->fd = fd;
+	list_add_tail(&event->list, &ctx.events);
 }
 
 static void unwatch_pollfd(int fd, void *userdata)
 {
-	struct event_source *ev_src;
+	struct event_source *event;
 
-	list_foreach_entry(ev_src, &ctx.ev_src_list, list) {
-		if (ev_src->fd == fd) {
-			event_unwatch_pollfd(ev_src->data);
-			list_del(&ev_src->list);
+	list_foreach_entry(event, &ctx.events, list) {
+		if (event->fd == fd) {
+			event_unwatch_pollfd(event->data);
+			list_del(&event->list);
 
-			free(ev_src);
+			free(event);
 			break;
 		}
 	}
