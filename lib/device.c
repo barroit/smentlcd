@@ -9,16 +9,25 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h>
 
+#include "calc.h"
 #include "event.h"
 #include "libusb.h"
 #include "log.h"
+#include "playback.h"
 #include "size.h"
 
-#define hotplug_register libusb_hotplug_register_callback
+#define libusb_hotplug_register libusb_hotplug_register_callback
 
 #define DEV_PLUGGED (1 << 0)
 #define DEV_ENABLED (1 << 1)
+
+struct transfer_buffer {
+	uint8_t (*buf)[sizeof(((struct frame *)0)->buf)];
+	uint32_t used;
+};
 
 struct dev_ctx {
 	uint32_t status;
@@ -27,6 +36,8 @@ struct dev_ctx {
 	struct libusb_device *dev;
 	struct libusb_device_handle *dh;
 	struct libusb_device_descriptor dd;
+
+	struct transfer_buffer tb;
 };
 
 int dev_wake_libusb(void);
@@ -59,6 +70,12 @@ void dev_init(void)
 
 	if (!libusb_pollfds_handle_timeouts(NULL))
 		die("your platform doesn't support automatically waking up when a USB transfer timeout expires");
+
+	ctx.tb.buf = mmap(NULL, bitsof(ctx.tb.used) * sizeof(*ctx.tb.buf),
+			  PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
+			  -1, 0);
+	if (ctx.tb.buf == MAP_FAILED)
+		die_errno("can't init transfer buffer");
 }
 
 static void watch_pollfd(int fd, short events, void *userdata)
@@ -136,12 +153,12 @@ static int handle_hotplug(struct libusb_context *libusb,
 
 	switch (event) {
 	case LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED:
+		if (ctx.status & DEV_PLUGGED)
+			break;
+
 		ctx.status |= DEV_PLUGGED;
 
 		ctx.dev = dev;
-		/*
-		 * Since libusb-1.0.16, this function always succeeds.
-		 */
 		libusb_get_device_descriptor(dev, &ctx.dd);
 
 		record("device %" PRIx16 ":%" PRIx16 " plugged",
@@ -177,13 +194,13 @@ void dev_enable_hotplug(void)
 {
 	int err;
 
-	err = hotplug_register(NULL,
-			       LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED |
-			       LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
-			       LIBUSB_HOTPLUG_ENUMERATE,
-			       CONFIG_DEVICE_VID, CONFIG_DEVICE_PID,
-			       LIBUSB_HOTPLUG_MATCH_ANY,
-			       handle_hotplug, NULL, NULL);
+	err = libusb_hotplug_register(NULL,
+				      LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED |
+				      LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
+				      LIBUSB_HOTPLUG_ENUMERATE,
+				      CONFIG_DEVICE_VID, CONFIG_DEVICE_PID,
+				      LIBUSB_HOTPLUG_MATCH_ANY,
+				      handle_hotplug, NULL, NULL);
 	if (err)
 		die_libusb(err, "failed to register hotplug event callback");
 }
@@ -191,6 +208,87 @@ void dev_enable_hotplug(void)
 int dev_enabled(void)
 {
 	return ctx.status & DEV_ENABLED;
+}
+
+static void handle_transfer_done(struct libusb_transfer *transfer)
+{
+	typeof(ctx.tb.buf) slot;
+	unsigned int idx;
+
+	switch (transfer->status) {
+	case LIBUSB_TRANSFER_NO_DEVICE:
+		error("device disconnected during frame transfer");
+		disable_device();
+		break;
+	case LIBUSB_TRANSFER_TIMED_OUT:
+		warn("frame transfer timed out");
+		break;
+	case LIBUSB_TRANSFER_STALL:
+		error("device state corrupted");
+		disable_device();
+		break;
+	}
+
+	slot = transfer->user_data;
+	idx = slot - ctx.tb.buf;
+
+	ctx.tb.used &= ~(UINT32_C(1) << idx);
+	libusb_free_transfer(transfer);
+}
+
+static unsigned int acquire_transfer_slot(void)
+{
+	unsigned int idx;
+
+	for (idx = 0; idx < bitsof(ctx.tb.used); idx++) {
+		uint32_t mask;
+
+		mask = UINT32_C(1) << idx;
+		if (!(ctx.tb.used & mask)) {
+			ctx.tb.used |= mask;
+			return idx;
+		}
+	}
+
+	return -1;
+}
+
+int dev_submit_frame(uint8_t *buf, unsigned int size, unsigned int idx)
+{
+	int err;
+	unsigned int slot;
+	struct libusb_transfer *transfer;
+
+	transfer = libusb_alloc_transfer(0);
+	if (!transfer) {
+		error_libusb(LIBUSB_ERROR_NO_MEM,
+			     "can't allocate USB transfer");
+		return -1;
+	}
+
+	slot = acquire_transfer_slot();
+	if (slot == -1) {
+		warn("frame %u dropped due to transfer buffer slot exhaustion",
+		     idx);
+		libusb_free_transfer(transfer);
+		return 0;
+	}
+
+	memcpy(ctx.tb.buf[slot], buf, size);
+	libusb_fill_bulk_transfer(transfer, ctx.dh, CONFIG_DEVICE_LCD_ENDPOINT,
+				  ctx.tb.buf[slot], size, handle_transfer_done,
+				  &ctx.tb.buf[slot],
+				  CONFIG_DEVICE_TRANSFER_TIMEOUT);
+
+	err = libusb_submit_transfer(transfer);
+	if (err) {
+		error_libusb(err, "can't submit transfer");
+		ctx.tb.used &= ~(UINT32_C(1) << slot);
+		libusb_free_transfer(transfer);
+		return -1;
+	}
+
+	return 0;
 }
 
 int dev_get_vendor_id(const char **ret)

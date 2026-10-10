@@ -7,10 +7,18 @@
 #include "device.h"
 #include "event.h"
 #include "ipc.h"
+#include "packet.h"
+#include "playback.h"
 
 void daemon_exec_req(struct ipc_request *req, struct ipc_response *res);
 
 const char *cmd_main_start_help = "start the daemon process";
+
+static void error_res(struct ipc_response *res, const char *str)
+{
+	res->type = IPC_RES_ERROR;
+	res->error = str;
+}
 
 static void stat_device(struct ipc_response *res)
 {
@@ -62,22 +70,42 @@ static void stat_device(struct ipc_response *res)
 		res->stat.field |= IPC_DEV_STAT_SPEED;
 }
 
+static void loop_playback(struct ipc_response *res, int fd)
+{
+	int err;
+
+	playback_cleanup();
+
+	err = playback_snapshot(fd);
+	if (err) {
+		error_res(res, "can't take snapshot for playback");
+		return;
+	}
+
+	err = playback_sched_loop();
+	if (err) {
+		error_res(res, "can't schedule playback loop");
+		return;
+	}
+
+	res->type = IPC_RES_SUCCESS;
+}
+
 void daemon_exec_req(struct ipc_request *req, struct ipc_response *res)
 {
 	if (!dev_enabled()) {
-		res->type = IPC_RES_ERROR;
-		res->error = "device unavailable";
+		error_res(res, "device unavailable");
 		return;
 	}
 
 	switch (req->type) {
 	case IPC_REQ_FRAME:
+		loop_playback(res, req->fd);
 		break;
 	case IPC_REQ_CLEAR:
 		break;
 	case IPC_REQ_STAT:
 		stat_device(res);
-		break;
 	}
 }
 

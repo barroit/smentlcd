@@ -69,7 +69,8 @@ ctl-obj-y += build/lib/image.o \
 	     build/lib/packet.o
 
 daemon-obj-y += build/lib/device.o \
-		build/lib/log_nb.o
+		build/lib/log_nb.o \
+		build/lib/playback.o
 
 ifeq ($(SERVICE),systemd)
   ctl-obj-y += build/lib/stbi.o \

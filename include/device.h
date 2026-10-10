@@ -27,6 +27,8 @@ void dev_enable_hotplug(void);
 
 int dev_enabled(void);
 
+int dev_submit_frame(uint8_t *buf, unsigned int size, unsigned int idx);
+
 int dev_get_vendor_id(const char **ret);
 
 int dev_get_manufacturer(const char **ret);

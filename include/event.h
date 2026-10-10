@@ -7,8 +7,11 @@
 #define EVENT_H
 
 #include <stddef.h>
+#include <stdint.h>
 
-typedef void (*event_handler_fn)(void);
+typedef void (*event_once_fn)(void);
+
+typedef int (*event_timeout_fn)(void);
 
 void event_init(void);
 
@@ -16,7 +19,13 @@ void *event_current(void);
 
 void event_start_loop(void);
 
-int event_sched_once(event_handler_fn handler);
+int event_sched_once(event_once_fn handler);
+
+int event_sched_timeout(void **timer, uint64_t msec, event_timeout_fn handler);
+
+int event_resched_timeout(void *timer, uint64_t msec);
+
+void event_destroy_timeout(void *timer);
 
 void *event_watch_pollfd(size_t nalloc, int fd, short events);
 

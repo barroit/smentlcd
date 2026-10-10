@@ -20,4 +20,10 @@ struct playback {
 	struct frame frames[];
 };
 
+void playback_cleanup(void);
+
+int playback_snapshot(int fd);
+
+int playback_sched_loop(void);
+
 #endif /* PLAYBACK_H */

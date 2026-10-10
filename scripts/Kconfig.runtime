@@ -14,6 +14,14 @@ config DEVICE_PID
 	hex "SpaceMouse Enterprice product ID"
 	default 0x$(cut,$(first-line,device_info),2)
 
+config DEVICE_LCD_ENDPOINT
+	hex "SpaceMouse Enterprice LCD endpoint number"
+	default 0x01
+
+config DEVICE_TRANSFER_TIMEOUT
+	int "SpaceMouse Enterprice bulk transfer timeout (in milliseconds)"
+	default 100
+
 config RECORD_SHOW_TIMESTAMP
 	bool "Prefix record message with timestamp"
 	default n
