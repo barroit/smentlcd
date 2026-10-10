@@ -208,8 +208,8 @@ int dev_enabled(void)
 
 static void handle_transfer_done(struct libusb_transfer *transfer)
 {
-	typeof(ctx.tb.buf) slot;
-	unsigned int idx;
+	typeof(ctx.tb.buf) buf;
+	unsigned int slot;
 
 	switch (transfer->status) {
 	case LIBUSB_TRANSFER_NO_DEVICE:
@@ -225,10 +225,10 @@ static void handle_transfer_done(struct libusb_transfer *transfer)
 		break;
 	}
 
-	slot = transfer->user_data;
-	idx = slot - ctx.tb.buf;
+	buf = transfer->user_data;
+	slot = buf - ctx.tb.buf;
 
-	ctx.tb.used &= ~(UINT32_C(1) << idx);
+	ctx.tb.used &= ~(UINT32_C(1) << slot);
 	libusb_free_transfer(transfer);
 }
 

@@ -1,0 +1,14 @@
+--- a/libdeflate/lib/deflate_compress.c
++++ b/libdeflate/lib/deflate_compress.c
+@@ -1803,9 +1803,7 @@
+ 	/*
+-	 * Choose and output the cheapest type of block.  If there is a tie,
+-	 * prefer uncompressed, then static, then dynamic.
++	 * Use the fixed Huffman coding.
+ 	 */
+-
+-	best_cost = MIN(dynamic_cost, MIN(static_cost, uncompressed_cost));
++	best_cost = static_cost;
+
+ 	/* If the block isn't going to fit, then stop early. */
+ 	if (DIV_ROUND_UP(bitcount + best_cost, 8) > os->end - out_next) {
