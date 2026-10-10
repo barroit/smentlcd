@@ -179,12 +179,8 @@ static int handle_hotplug(struct libusb_context *libusb,
 		break;
 
 	case LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT:
-		ctx.status = 0;
-
-		record("device %" PRIx16 ":%" PRIx16 " unplugged",
-		       ctx.dd.idVendor, ctx.dd.idProduct);
-
 		libusb_close(ctx.dh);
+		exit(39);
 	}
 
 	return 0;

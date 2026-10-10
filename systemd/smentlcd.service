@@ -8,3 +8,5 @@ After = smentlcd.socket
 [Service]
 Type = exec
 ExecStart = %h/.local/bin/smentlcdd start
+Restart = on-failure
+RestartSec = 500ms
