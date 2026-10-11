@@ -46,7 +46,6 @@ struct ipc_dev_stat {
 
 enum ipc_request_type {
 	IPC_REQ_FRAME,
-	IPC_REQ_CLEAR,
 	IPC_REQ_STAT,
 	__IPC_REQ_MAX,
 };

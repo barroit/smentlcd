@@ -47,7 +47,6 @@ static struct ipc_ctx ctx;
 
 static const char *method_table[__IPC_REQ_MAX] = {
 	[IPC_REQ_FRAME] = IPC_INTERFACE_NAME ".Frame",
-	[IPC_REQ_CLEAR] = IPC_INTERFACE_NAME ".Clear",
 	[IPC_REQ_STAT]  = IPC_INTERFACE_NAME ".Stat",
 };
 

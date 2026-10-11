@@ -102,8 +102,6 @@ void daemon_exec_req(struct ipc_request *req, struct ipc_response *res)
 	case IPC_REQ_FRAME:
 		loop_playback(res, req->fd);
 		break;
-	case IPC_REQ_CLEAR:
-		break;
 	case IPC_REQ_STAT:
 		stat_device(res);
 	}

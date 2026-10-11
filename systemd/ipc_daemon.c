@@ -33,7 +33,6 @@ static int method_ ## name(sd_varlink *link,			\
 			   void *userdata)
 
 DECLARE_METHOD(frame);
-DECLARE_METHOD(clear);
 DECLARE_METHOD(stat);
 
 struct ipc_ctx {
@@ -48,8 +47,6 @@ struct method_map {
 };
 
 DEFINE_METHOD_SCHEME(Frame);
-
-DEFINE_METHOD_SCHEME(Clear);
 
 DEFINE_METHOD_SCHEME(Stat,
 		     DEFINE_OUTPUT_SCHEME(field, SD_VARLINK_INT, 0),
@@ -75,13 +72,11 @@ DEFINE_ERROR_SCHEME(Error,
 
 static SD_VARLINK_DEFINE_INTERFACE(scheme, IPC_INTERFACE_NAME,
 				   &vl_method_Frame,
-				   &vl_method_Clear,
 				   &vl_method_Stat,
 				   &vl_error_Error);
 
 static struct method_map methods[] = {
 	{ IPC_INTERFACE_NAME ".Frame", method_frame },
-	{ IPC_INTERFACE_NAME ".Clear", method_clear },
 	{ IPC_INTERFACE_NAME ".Stat",  method_stat  },
 	{ NULL, NULL },
 };
@@ -143,11 +138,6 @@ DECLARE_METHOD(frame)
 
 	close(req.fd);
 	return emit_reply(link, &res);
-}
-
-DECLARE_METHOD(clear)
-{
-	return sd_varlink_reply(link, NULL);
 }
 
 DECLARE_METHOD(stat)
