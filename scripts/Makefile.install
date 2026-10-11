@@ -15,8 +15,8 @@ install_systemd: install_program
 	       'MODE="0660", ' | \
 	sudo tee /etc/udev/rules.d/39-smentlcd.rules
 
-	printf 'ATTR{idVendor}=="%s", ATTR{idProduct}=="%s"\n' \
-	       $$(cut -f1 device_info) $$(cut -f2 device_info) | \
+	printf 'ATTR{idVendor}=="%04x", ATTR{idProduct}=="%04x"\n' \
+	       $(CONFIG_DEVICE_VID) $(CONFIG_DEVICE_PID) | \
 	sudo tee -a /etc/udev/rules.d/39-smentlcd.rules
 
 	sudo groupadd -f smentlcd
@@ -24,12 +24,19 @@ install_systemd: install_program
 	sudo udevadm control --reload-rules
 
 	mkdir -p $(HOME)/.config/systemd/user
-	cp systemd/smentlcd.* $(HOME)/.config/systemd/user
+	rm -f $(HOME)/.config/systemd/user/smentlcd.service \
+	      $(HOME)/.config/systemd/user/smentlcd.socket
+	install -m $$(umask -S),a-x \
+		systemd/smentlcd.service systemd/smentlcd.socket \
+		$(HOME)/.config/systemd/user
 	systemctl --user daemon-reload
 
 uninstall_systemd:
 	systemctl --user stop smentlcd.service smentlcd.socket
 	systemctl --user disable smentlcd.service smentlcd.socket
+	rm -f $(HOME)/.config/systemd/user/smentlcd.service \
+	      $(HOME)/.config/systemd/user/smentlcd.socket
+	rm -f $(HOME)/.local/bin/$(name)d $(HOME)/.local/bin/$(name)ctl
 	systemctl --user daemon-reload
 
 	sudo rm /etc/udev/rules.d/39-smentlcd.rules
@@ -40,10 +47,7 @@ uninstall_systemd:
 
 .PHONY: install_program
 
-install_program: $(HOME)/.local/bin/$(name)d $(HOME)/.local/bin/$(name)ctl
-
-$(HOME)/.local/bin/$(name)d: build/$(name)d
-	cp $< $@
-
-$(HOME)/.local/bin/$(name)ctl: build/$(name)ctl
-	cp $< $@
+install_program: build/$(name)d build/$(name)ctl
+	mkdir -p $(HOME)/.local/bin
+	rm -f $(HOME)/.local/bin/$(name)d $(HOME)/.local/bin/$(name)ctl
+	install -m $$(umask -S) $^ $(HOME)/.local/bin
