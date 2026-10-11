@@ -3,10 +3,9 @@
 build/daemon/%/entry: $(lib-obj-y) $(daemon-obj-y) \
 		      build/libusb.a
 	mkdir -p $(@D)
-	$(CC) $(LDFLAGS) \
-	      $(filter %.o,$^) \
+	$(CC) $(filter %.o,$^) \
 	      $(filter %.a,$^) \
-	      $(DAEMON_LDFLAGS) \
+	      $(LDFLAGS) $(DAEMON_LDFLAGS) \
 	      -o $@
 
 build/libusb.a: libusb/libusb-1.0.a

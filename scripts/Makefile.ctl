@@ -3,9 +3,9 @@
 build/ctl/%/entry: $(lib-obj-y) $(ctl-obj-y) \
 		   build/libdeflate.a
 	mkdir -p $(@D)
-	$(CC) $(LDFLAGS) \
-	      $(filter %.o,$^) \
+	$(CC) $(filter %.o,$^) \
 	      $(filter %.a,$^) \
+	      $(LDFLAGS) \
 	      -o $@
 
 build/ctl/cmdtree:
