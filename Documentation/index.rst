@@ -7,4 +7,9 @@ The sment-lcd documentation
 .. toctree::
    :maxdepth: 2
 
-   lib/parse_argv
+   lib/atexit.rst
+   lib/barrier.rst
+   lib/list.rst
+   lib/parse_argv.rst
+   lib/rio.rst
+   lib/strtox.rst
