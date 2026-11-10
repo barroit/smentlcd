@@ -1,15 +1,16 @@
+==========
 parse_argv
 ==========
 
 ``parse_argv`` parses command line arguments in-place.
 
-Parser consumes known options and flags. When command entries exist, parser may
-also select one command. Arguments left for caller are stored back into same
-``argv`` array and terminated with NULL.
+The parser consumes known options and flags. When command entries exist, the
+parser may also select a command. Remaining arguments are written back to
+``argv`` and terminated with ``NULL``.
 
-Caller owns all value storage. Initialize flag, count, number, string, pick,
-and command mode targets before calling ``pa_parse_args()``. Parser updates
-target objects, but doesn't initialize them.
+The caller owns all target storage. Initialize flag, count, number, string,
+pick, and command mode targets before calling ``pa_parse_args()``. The parser
+updates target objects but does not initialize them.
 
 Terms
 -----
@@ -24,7 +25,7 @@ Terms
 		--no-name
 
 ``flag``
-	Argument part introduced by ``-``.
+	Argument beginning with a single ``-``.
 
 	Examples::
 
@@ -32,9 +33,9 @@ Terms
 		-abc
 		-xvalue
 
-	In ``-abc``, ``a``, ``b``, and ``c`` are flags. Parser handles them one
-	by one unless one flag takes value. A value-taking flag consumes rest of
-	string as value.
+	In ``-abc``, ``a``, ``b``, and ``c`` are flags. The parser handles them
+	one by one unless a flag takes a value. A value-taking flag consumes the
+	rest of the string as its value.
 
 ``bare argument``
 	Argument that doesn't start with ``-``.
@@ -48,56 +49,56 @@ Terms
 Basic model
 -----------
 
-Parser walks ``argv[1..]`` from left to right.
+The parser walks ``argv[1..]`` from left to right.
 
-``argv[0]`` must be set to command name for current parse round. Parser
-appends it to diagnostic path.
+``argv[0]`` must contain the command name for the current parsing pass. The
+parser appends it to the diagnostic path.
 
 Example diagnostic path after nested parsing::
 
 	prog add
 
 Known options and flags are applied immediately. Bare arguments are stored in
-output ``argv``, rejected, or used for command lookup depending on parser
-state.
+the output ``argv``, rejected, or used for command lookup, depending on the
+parser state.
 
-``pa_parse_args()`` reuses ``argv`` for output. It returns number of arguments
-left for caller. Output arguments start at ``argv[0]``.
+``pa_parse_args()`` reuses ``argv`` for output. It returns the number of
+arguments left for the caller. Output arguments start at ``argv[0]``.
 
 Parser flags
 ------------
 
 ``PA_STOP_BARE``
-	Stop parsing when first bare argument is seen.
+	Stop parsing at the first bare argument.
 
 	Do not use this with command entries.
 
 ``PA_LAX_CMD``
-	Make command optional.
+	Make command selection optional.
 
-	With this flag set, caller must set default command before parsing by
-	setting ``*cmd_val`` to the target ``cmd_fn``. If no command is selected,
-	parser inserts default command at ``argv[0]``.
+	Before parsing, set ``*cmd_val`` to the default command's ``cmd_fn``.
+	If no command is selected, the parser inserts the default command at
+	``argv[0]``.
 
-	This flag also enables ``PA_STOP_UNKNOWN`` so default command can parse
-	its own options and flags later.
+	This flag also enables ``PA_STOP_UNKNOWN`` so the default command can
+	parse its own options and flags later.
 
-	Unknown bare argument closes command lookup. Parser still parses later
-	options and flags. Later bare arguments are returned as operands.
+	An unknown bare argument closes command lookup. The parser still parses
+	later options and flags. Later bare arguments are returned as operands.
 
-	Example, with ``add`` as valid command and ``status`` as default
+	Example, with ``add`` as a valid command and ``status`` as the default
 	command::
 
 		prog add -x
-			=> command add selected
+			=> command 'add' selected
 			=> argv: add -x
 
 		prog file add -x
-			=> command lookup closed at file
+			=> command lookup closed at 'file'
 			=> argv: status file add -x
 
 		prog file --verbose add
-			=> command lookup closed at file
+			=> command lookup closed at 'file'
 			=> --verbose parsed
 			=> argv: status file add
 
@@ -105,91 +106,93 @@ Parser flags
 	Reject bare arguments.
 
 ``PA_STOP_UNKNOWN``
-	Stop parsing when unknown option or unknown flag is seen.
+	Stop parsing when an unknown option or flag is seen.
 
 	Bare ``-`` is an unknown flag. With ``PA_STOP_UNKNOWN``, it is stored in
-	output ``argv``.
+	the output ``argv``.
 
-	For unknown flag inside a flag cluster, parser reformats remaining part
-	as a flag argument and stores it in output ``argv``. If ``-a`` is known
-	and ``-b`` is unknown, ``-ab`` applies ``-a`` and stores ``-b`` in output
-	``argv``.
+	For an unknown flag inside a flag cluster, the parser reformats the
+	remaining part as a flag argument and stores it in the output ``argv``.
+	If ``-a`` is known and ``-b`` is unknown, ``-ab`` applies ``-a`` and
+	stores ``-b`` in the output ``argv``.
 
 Entry helpers
 -------------
 
 ``PA_OPT_END()``
-	Terminate ``pa_opt`` array. Required for every ``pa_opt`` list.
+	Terminate a ``pa_opt`` array. Required for every ``pa_opt`` list.
 
 ``PA_OPT_CMD(name, cmd_val, cmd_fn, help)``
-	Add command entry.
+	Add a command entry.
 
 ``PA_OPT_FLAG(name, alias, val, mask, help)``
-	Add flag-mask entry.
+	Add a flag-mask entry.
 
-	Target is ``uint64_t``. Set form ORs ``mask`` into target. Unset form
-	clears ``mask`` from target.
+	The target is ``uint64_t``. The set form ORs ``mask`` into the target.
+	The unset form clears ``mask`` from the target.
 
 ``PA_OPT_COUNT(name, alias, val, help)``
-	Add counter entry.
+	Add a counter entry.
 
-	Target is ``int``. Set form increments target. Unset form resets target
-	to zero.
+	The target is ``int``. The set form increments the target. The unset
+	form resets the target to zero.
 
 ``PA_OPT_NUMBER(name, alias, val, help)``
-	Add number entry.
+	Add a number entry.
 
-	Default target is ``unsigned int``. Use ``PA_OPT_SIGNED`` for
-	``int`` target. Use ``PA_OPT_LLONG`` for ``unsigned long long`` target.
-	Use both ``PA_OPT_SIGNED`` and ``PA_OPT_LLONG`` for ``long long`` target.
+	By default, the target is ``unsigned int``. Use ``PA_OPT_SIGNED`` for
+	an ``int`` target. Use ``PA_OPT_LLONG`` for an ``unsigned long long``
+	target. Use both ``PA_OPT_SIGNED`` and ``PA_OPT_LLONG`` for a
+	``long long`` target.
 
 ``PA_OPT_STRING(name, alias, val, help)``
-	Add string entry.
+	Add a string entry.
 
-	Target is ``const char *``. Set form sets target to value. Unset form
-	sets target to NULL.
+	The target is ``const char *``. The set form sets the target to the
+	value. The unset form sets the target to ``NULL``.
 
 ``PA_OPT_FILE(name, alias, val, help)``
-	Add string entry with value hint set to ``path``.
+	Add a string entry with the value hint set to ``path``.
 
 ``PA_OPT_CMDMODE(name, alias, val, mode, help)``
-	Add command mode entry.
+	Add a command mode entry.
 
-	Target is ``int``. Parser sets target to ``mode``. Command mode entries
-	for same target (same pointer) are mutually exclusive.
+	The target is ``int``. The parser sets the target to ``mode``. Command
+	mode entries for the same target (same pointer) are mutually exclusive.
 
 ``PA_OPT_PICK(name, alias, val, options, help)``
-	Add pick entry.
+	Add a pick entry.
 
-	Target is ``const char *``. ``options`` is a NULL-terminated string array
-	used for validation. Value must match one item in that array.
+	The target is ``const char *``. ``options`` is a NULL-terminated string
+	array used for validation. The value must match one item in the array.
 
-	With ``PA_OPT_LAX_ARG``, missing value makes parser set target to first
-	item in array.
+	With ``PA_OPT_LAX_ARG``, a missing value makes the parser set the
+	target to the first item in the array.
 
 Entry matching
 --------------
 
-An entry may provide option form, flag form, or both. NULL ``name`` means no
-option form. Zero ``alias`` means no flag form.
+An entry may provide an option form, a flag form, or both. A NULL ``name``
+means no option form. A zero ``alias`` means no flag form.
 
-Option names may be abbreviated. Parser accepts abbreviation if it identifies
-one option. If multiple options match, parser reports ambiguity.
+Option names may be abbreviated. The parser accepts an abbreviation if it
+uniquely identifies an option. If multiple options match, the parser reports
+ambiguity.
 
-``=`` belongs to option syntax. Text before ``=`` is used for matching. Text
-after ``=`` is value.
+``=`` belongs to option syntax. The text before ``=`` is used for matching.
+The text after ``=`` is the value.
 
 Negative options
 ----------------
 
 Unless ``PA_OPT_NO_NEG`` is set, options accept ``--no-name``.
 
-For normal option names, ``--no-name`` sets unset state.
+For normal option names, ``--no-name`` sets the unset state.
 
-For option names already starting with ``no-``, unset state is inverted.
+For option names already starting with ``no-``, the unset state is inverted.
 
-Caution: unset state doesn't restore target objects to caller's default
-value. It applies unset operation defined by entry helper.
+Caution: The unset state does not restore target objects to the caller's
+default values. It applies the unset operation defined by the entry helper.
 
 ``--no-`` is a valid prefix for negatable options. It may be ambiguous when
 more than one negatable option exists.
@@ -197,7 +200,7 @@ more than one negatable option exists.
 Values
 ------
 
-An option or flag takes value unless it has ``PA_OPT_NO_ARG``.
+An option or flag takes a value unless it has ``PA_OPT_NO_ARG``.
 
 Options accept both forms::
 
@@ -209,13 +212,13 @@ Flags accept both forms::
 	-nvalue
 	-n value
 
-For flag clusters, value-taking flag consumes rest of string as value. If
-``-o`` takes value, ``-ofile`` assigns ``file`` to ``-o``.
+For flag clusters, a value-taking flag consumes the rest of the string as
+its value. If ``-o`` takes a value, ``-ofile`` assigns ``file`` to ``-o``.
 
-``PA_OPT_LAX_ARG`` makes value optional.
+``PA_OPT_LAX_ARG`` makes the value optional.
 
-Optional values are greedy. If next argv item exists, parser consumes it as
-value. Otherwise parser uses entry default.
+Optional values are consumed greedily. If the next ``argv`` item exists, the
+parser consumes it as the value. Otherwise, the parser uses the entry default.
 
 Examples::
 
@@ -228,34 +231,35 @@ Examples::
 Commands
 --------
 
-Command is a special bare argument.
+A command is a special bare argument.
 
-When command entries exist, parser tries to match eligible bare argument as
-command name. Command name remains in output ``argv`` so next parse round can
-use it as ``argv[0]``.
+When command entries exist, the parser tries to match an eligible bare
+argument against command names. The command name remains in the output
+``argv`` so the next parsing pass can use it as ``argv[0]``.
 
-If command entries exist and ``PA_LAX_CMD`` is not set, parser panics on
-missing command.
+If command entries exist and ``PA_LAX_CMD`` is not set, the parser panics if
+no command is found.
 
 End of options
 --------------
 
 ``--`` stops option and flag parsing.
 
-Remaining arguments after ``--`` are stored in output ``argv``.
+Remaining arguments after ``--`` are stored in the output ``argv``.
 
 Help
 ----
 
 ``-h`` and ``--help`` print usage and exit.
 
-Usage lines and entries are printed. Entries show command form, flag form,
+Usage lines and entries are printed. Entries show the command form, flag form,
 option form, value hint, and help text. Long text is wrapped.
 
 Return value
 ------------
 
-``pa_parse_args()`` returns number of arguments stored in output ``argv``.
+``pa_parse_args()`` returns the number of arguments stored in the output
+``argv``.
 
-Parser writes output arguments to ``argv[0..ret - 1]`` and terminates them
-with ``NULL``.
+The parser writes output arguments to ``argv[0..ret - 1]`` and appends a
+``NULL`` terminator.
