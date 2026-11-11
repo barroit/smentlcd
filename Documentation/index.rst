@@ -13,3 +13,4 @@ The sment-lcd documentation
    lib/parse_argv.rst
    lib/rio.rst
    lib/strtox.rst
+   lib/xalloc.rst
