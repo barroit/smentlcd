@@ -9,6 +9,7 @@ The sment-lcd documentation
 
    lib/atexit.rst
    lib/barrier.rst
+   lib/compiler.rst
    lib/list.rst
    lib/parse_argv.rst
    lib/rio.rst
