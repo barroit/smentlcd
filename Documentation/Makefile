@@ -6,14 +6,10 @@ sphinx-autobuild ?= sphinx-autobuild
 sphinx-build += --conf-dir sphinx
 sphinx-autobuild += --conf-dir sphinx
 
-prefix := build
-
-builds := html man info help
-
-.PHONY: live $(builds)
+.PHONY: live html man info help
 
 live:
-	$(sphinx-autobuild) --builder html . $(prefix)/html
+	$(sphinx-autobuild) --builder html . build/html
 
-$(builds):
-	$(sphinx-build) --builder $@ . $(prefix)/$@
+html man info help:
+	$(sphinx-build) --builder $@ . build/$@

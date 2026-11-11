@@ -3,7 +3,7 @@
 copyright = '2026 Jiamu Sun'
 author = 'Jiamu Sun'
 
-project = 'blog.barroit.sh'
+project = 'smentlcd'
 version = 'v0.1'
 release = version
 
