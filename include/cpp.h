@@ -30,6 +30,7 @@
 #define __NOOP_6(_1, _2, _3, _4, _5, _6) \
 	do { if ((_1) && (_2) && (_3) && (_4) && (_5) && (_6)); } while (0)
 
+#undef __CONCAT
 #define CONCAT(a, b)   __CONCAT(a, b)
 #define __CONCAT(a, b) a ## b
 
