@@ -8,6 +8,7 @@ The sment-lcd documentation
    :maxdepth: 2
 
    lib/atexit.rst
+   lib/attr.rst
    lib/barrier.rst
    lib/compiler.rst
    lib/cpp.rst
