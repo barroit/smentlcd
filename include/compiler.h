@@ -50,7 +50,7 @@
 
 #define assert_array(x) BUG_ON_EXPR(type_is_same(x, &x[0]))
 
-#define assert_pow2(x) BUG_ON_EXPR(!(x) || ((x) % 2) != 0)
+#define assert_pow2(x) BUG_ON_EXPR(!(x) || ((x) & ((x) - 1)))
 
 #define assert_ascii(x) BUG_ON_EXPR(((unsigned char)x) & 0x80)
 
