@@ -25,3 +25,5 @@ html_css_files = [
 extensions = [
 	'linuxdoc.rstKernelDoc',
 ]
+
+kernel_doc_srctree = '..'
