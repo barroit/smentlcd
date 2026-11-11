@@ -21,6 +21,8 @@ typedef void (*log_nb_terminate_fn)(void);
 
 extern int log_nb_enabled;
 
+extern log_nb_terminate_fn log_nb_terminate;
+
 int log_nb_catch_signal(void);
 
 void log_nb_restore_signal(void);
@@ -28,8 +30,6 @@ void log_nb_restore_signal(void);
 int __log_nb_init(void);
 
 int log_nb_init(void);
-
-extern log_nb_terminate_fn log_nb_terminate;
 
 int __log_nb_ring_produce(int fd, const char *prefix, const char *hint,
 			  const char *fmt, va_list ap);
