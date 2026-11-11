@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <locale.h>
 
-#include "foreach.h"
+#include "calc.h"
 #include "log.h"
 #include "unicode.h"
 
@@ -44,7 +44,7 @@ static int try_c_locales(void)
 		"C.utf8",
 	};
 
-	foreach_idx(idx, sizeof_array(cands)) {
+	for (idx = 0; idx < sizeof_array(cands); idx++) {
 		if (setlocale(LC_CTYPE, cands[idx]))
 			return 0;
 	}

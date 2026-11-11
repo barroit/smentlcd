@@ -10,7 +10,6 @@
 #include <sys/stat.h>
 
 #include "atexit.h"
-#include "foreach.h"
 #include "size.h"
 #include "unitest.h"
 
@@ -99,7 +98,7 @@ int main(int argc, const char **argv)
 	/*
 	 * FIXME: support MT
 	 */
-	foreach_idx(idx, stop) {
+	for (idx = 0; idx < stop; idx++) {
 		struct unitest unitest = { 0 };
 		int err = tests[idx](&unitest);
 		const char *not = err ? "not " : "";
