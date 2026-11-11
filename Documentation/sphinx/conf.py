@@ -14,5 +14,14 @@ html_theme = 'furo'
 html_logo = 'images/strawberry.svg'
 html_favicon = 'images/strawberry.png'
 
-html_static_path = [ 'static' ]
-html_css_files = [ 'custom.css' ]
+html_static_path = [
+	'static',
+]
+
+html_css_files = [
+	'custom.css',
+]
+
+extensions = [
+	'linuxdoc.rstKernelDoc',
+]
