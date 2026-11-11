@@ -1,6 +1,6 @@
-===
-rio
-===
+=====
+rio.h
+=====
 
 ``rio`` provides wrappers for I/O operations that retry when interrupted by a
 signal.

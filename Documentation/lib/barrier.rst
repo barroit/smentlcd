@@ -1,6 +1,6 @@
-=======
-barrier
-=======
+=========
+barrier.h
+=========
 
 ``barrier`` provides atomic memory access and synchronization primitives using
 compiler's ``__atomic`` builtins.

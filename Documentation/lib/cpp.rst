@@ -1,6 +1,6 @@
-===
-cpp
-===
+=====
+cpp.h
+=====
 
 ``cpp`` provides general-purpose C preprocessor utilities.
 

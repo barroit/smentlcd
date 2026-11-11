@@ -1,6 +1,6 @@
-====
-list
-====
+======
+list.h
+======
 
 ``list`` provides circular, doubly linked lists using embedded ``list_head``
 structures.

@@ -1,6 +1,6 @@
-========
-compiler
-========
+==========
+compiler.h
+==========
 
 ``compiler`` provides compiler builtins, type checks, and compile-time
 assertions.

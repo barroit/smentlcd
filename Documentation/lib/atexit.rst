@@ -1,6 +1,6 @@
-======
-atexit
-======
+========
+atexit.h
+========
 
 ``atexit`` manages routines to be called at normal process termination.
 

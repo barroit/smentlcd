@@ -1,6 +1,6 @@
-======
-strtox
-======
+========
+strtox.h
+========
 
 ``strtox`` converts strings to integers with strict input and range validation.
 

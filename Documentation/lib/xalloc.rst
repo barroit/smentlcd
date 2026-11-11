@@ -1,6 +1,6 @@
-======
-xalloc
-======
+========
+xalloc.h
+========
 
 ``xalloc`` provides memory allocation wrappers that terminate the process on
 failure.
