@@ -14,7 +14,7 @@
 
 #include "log_nb.h"
 #include "rio.h"
-#include "sgr.h"
+#include "ansi.h"
 #include "size.h"
 #include "strbuf.h"
 
@@ -100,12 +100,12 @@ void __log_record(const char *func, const char *fmt, ...)
 	if (IS_ENABLED(CONFIG_RECORD_SHOW_TIMESTAMP)) {
 		nw = snprintf(prefix, sizeof(prefix),
 			      H("[%" PRIu64 ".%" PRIu64 "] ",
-				SGR_BOLD, SGR_GREEN),
+				ANSI_BOLD, ANSI_GREEN),
 			      (uint64_t)tp.tv_sec, (uint64_t)tp.tv_nsec / 1000);
 		assert(nw > 0);
 	}
 
-	nw = snprintf(&prefix[nw], sizeof(prefix) - nw, H("%s():", SGR_WHITE),
+	nw = snprintf(&prefix[nw], sizeof(prefix) - nw, H("%s():", ANSI_WHITE),
 		      func);
 	assert(nw > 0);
 
@@ -121,7 +121,7 @@ void __log_warn(const char *hint, const char *fmt, ...)
 
 	va_start(ap, fmt);
 	log_vwritef(STDERR_FILENO,
-		    H("warn:", SGR_BOLD, SGR_YELLOW), hint, fmt, ap);
+		    H("warn:", ANSI_BOLD, ANSI_YELLOW), hint, fmt, ap);
 
 	va_end(ap);
 }
@@ -132,7 +132,7 @@ void __log_error(const char *hint, const char *fmt, ...)
 
 	va_start(ap, fmt);
 	log_vwritef(STDERR_FILENO,
-		    H("error:", SGR_BOLD, SGR_RED), hint, fmt, ap);
+		    H("error:", ANSI_BOLD, ANSI_RED), hint, fmt, ap);
 
 	va_end(ap);
 }
@@ -143,7 +143,7 @@ void __log_die(const char *hint, const char *fmt, ...)
 
 	va_start(ap, fmt);
 	log_vwritef(STDERR_FILENO,
-		    H("fatal:", SGR_BOLD, SGR_RED), hint, fmt, ap);
+		    H("fatal:", ANSI_BOLD, ANSI_RED), hint, fmt, ap);
 
 	if (log_nb_enabled)
 		log_nb_terminate();
