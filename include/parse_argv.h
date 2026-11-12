@@ -59,9 +59,6 @@ struct pa_opt {
 
 	const char *help;
 	const char *vhelp;
-
-	const char *__class;
-	const char *__cli;
 };
 
 #define PA_OPT_END() { .class = PA_OPTC_END }
