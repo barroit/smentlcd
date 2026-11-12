@@ -7,7 +7,7 @@ barrier.h
 ``barrier`` provides atomic memory access and synchronization primitives using
 the compiler's ``__atomic`` builtins.
 
-Memory ordering
+Memory Ordering
 ---------------
 
 Relaxed operations provide atomic access without imposing inter-thread ordering
@@ -24,7 +24,7 @@ ordering.
 
 For more details, see the Linux kernel's ``Documentation/memory-barriers.txt``.
 
-API reference
+API Reference
 -------------
 
 .. kernel-doc:: /include/barrier.h

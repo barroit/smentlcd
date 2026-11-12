@@ -8,7 +8,7 @@ attr.h
 function properties, initialization, diagnostics, symbol handling, and
 instrumentation.
 
-API reference
+API Reference
 -------------
 
 .. kernel-doc:: /include/attr.h

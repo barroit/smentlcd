@@ -15,7 +15,7 @@ Initialization
 Call ``atexit_setup()`` during initialization to register the exit handler with
 the standard library's ``atexit()``.
 
-Routine execution
+Routine Execution
 -----------------
 
 When the program returns from ``main()`` or calls ``exit()``, The exit handler
@@ -23,7 +23,7 @@ repeatedly pops and calls routines until the stack is empty.
 
 Routines pushed during exit handling are also processed.
 
-API reference
+API Reference
 -------------
 
 .. kernel-doc:: /include/atexit.h
