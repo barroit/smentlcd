@@ -12,13 +12,71 @@
 #include "calc.h"
 #include "compiler.h"
 
-#define xcalloc(...)       __xalloc(calloc, __VA_ARGS__)
-#define xmalloc(...)       __xalloc(malloc, __VA_ARGS__)
-#define xmmap(...)         __xalloc(mmap, __VA_ARGS__)
-#define xrealloc(...)      __xalloc(realloc, __VA_ARGS__)
-#define xreallocarray(...) __xalloc(reallocarray, __VA_ARGS__)
-#define xstrdup(...)       __xalloc(strdup, __VA_ARGS__)
+/**
+ * macro xcalloc - Allocate zero-initialized memory or terminate on failure.
+ * @nmemb: Number of elements.
+ * @size: Size of each element in bytes.
+ *
+ * Return: Pointer to the allocated memory.
+ */
+#define xcalloc(nmemb, size) __xalloc(calloc, nmemb, size)
 
+/**
+ * macro xmalloc - Allocate memory or terminate on failure.
+ * @size: Number of bytes to allocate.
+ *
+ * Return: Pointer to the allocated memory.
+ */
+#define xmalloc(size) __xalloc(malloc, size)
+
+/**
+ * macro xmmap - Map memory or terminate on failure.
+ * @addr: Requested mapping address.
+ * @len: Mapping length in bytes.
+ * @prot: Memory protection flags.
+ * @flags: Mapping flags.
+ * @fildes: File descriptor.
+ * @off: File offset.
+ *
+ * Return: Pointer to the mapped memory.
+ */
+#define xmmap(addr, len, prot, flags, fildes, off) \
+	__xalloc(mmap, addr, len, prot, flags, fildes, off)
+
+/**
+ * macro xrealloc - Resize an allocation or terminate on failure.
+ * @ptr: Pointer to the existing allocation.
+ * @size: New size in bytes.
+ *
+ * Return: Pointer to the resized memory.
+ */
+#define xrealloc(ptr, size) __xalloc(realloc, ptr, size)
+
+/**
+ * macro xreallocarray - Resize an array or terminate on failure.
+ * @ptr: Pointer to the existing allocation.
+ * @nmemb: Number of elements.
+ * @size: Size of each element in bytes.
+ *
+ * Return: Pointer to the resized memory.
+ */
+#define xreallocarray(ptr, nmemb, size) \
+	__xalloc(reallocarray, ptr, nmemb, size)
+
+/**
+ * macro xstrdup - Duplicate a string or terminate on failure.
+ * @s: NUL-terminated string to duplicate.
+ *
+ * Return: Pointer to the duplicated string.
+ */
+#define xstrdup(s) __xalloc(strdup, s)
+
+/**
+ * macro XREALLOCBUF - Grow an array or terminate on failure.
+ * @x: Pointer to the array.
+ * @new: Required number of elements.
+ * @cap: Current capacity, updated with the new capacity.
+ */
 #define XREALLOCBUF(x, new, cap)			\
 do {							\
 	if (assert_diff_type(*(x), void));		\
