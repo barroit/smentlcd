@@ -71,6 +71,11 @@
 #define ANSI_BG_CYAN    46
 #define ANSI_BG_WHITE   47
 
+/**
+ * macro H - Wrap a string literal with ANSI formatting and reset it afterward.
+ * @x: String literal to format.
+ * @...: One to three formatting codes.
+ */
 #define H(x, ...) __ansi(__VA_ARGS__) x __ansi(ANSI_RESET)
 
 #endif /* ANSI_H */

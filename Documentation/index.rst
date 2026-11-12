@@ -7,6 +7,7 @@ The smentlcd documentation
 .. toctree::
    :maxdepth: 1
 
+   lib/ansi.rst
    lib/atexit.rst
    lib/attr.rst
    lib/barrier.rst
