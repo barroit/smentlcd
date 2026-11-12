@@ -53,7 +53,7 @@
 /**
  * macro attr_constructor - Execute a function during program initialization.
  */
-#define attr_constructor() __attribute__((__constructor__))
+#define attr_constructor __attribute__((__constructor__))
 
 /**
  * macro attr_cleanup - Call a function when a local variable goes out of scope.
