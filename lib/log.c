@@ -115,28 +115,26 @@ void __log_record(const char *func, const char *fmt, ...)
 	va_end(ap);
 }
 
-int __log_warn(const char *hint, const char *fmt, ...)
+void __log_warn(const char *hint, const char *fmt, ...)
 {
 	va_list ap;
 
 	va_start(ap, fmt);
 	log_vwritef(STDERR_FILENO,
-		      H("warn:", SGR_BOLD, SGR_YELLOW), hint, fmt, ap);
+		    H("warn:", SGR_BOLD, SGR_YELLOW), hint, fmt, ap);
 
 	va_end(ap);
-	return 1;
 }
 
-int __log_error(const char *hint, const char *fmt, ...)
+void __log_error(const char *hint, const char *fmt, ...)
 {
 	va_list ap;
 
 	va_start(ap, fmt);
 	log_vwritef(STDERR_FILENO,
-		      H("error:", SGR_BOLD, SGR_RED), hint, fmt, ap);
+		    H("error:", SGR_BOLD, SGR_RED), hint, fmt, ap);
 
 	va_end(ap);
-	return 1;
 }
 
 void __log_die(const char *hint, const char *fmt, ...)
@@ -145,7 +143,7 @@ void __log_die(const char *hint, const char *fmt, ...)
 
 	va_start(ap, fmt);
 	log_vwritef(STDERR_FILENO,
-		      H("fatal:", SGR_BOLD, SGR_RED), hint, fmt, ap);
+		    H("fatal:", SGR_BOLD, SGR_RED), hint, fmt, ap);
 
 	if (log_nb_enabled)
 		log_nb_terminate();

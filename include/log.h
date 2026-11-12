@@ -49,8 +49,6 @@ extern log_vwritef_fn log_vwritef;
  * macro warn - Write a warning to stderr.
  * @fmt: printf-style format string.
  * @...: Format arguments.
- *
- * Return: Always 1.
  */
 #define warn(fmt, ...) __log_warn(NULL, fmt, ##__VA_ARGS__)
 
@@ -58,8 +56,6 @@ extern log_vwritef_fn log_vwritef;
  * macro warn_errno - Write a warning with the current errno description.
  * @fmt: printf-style format string.
  * @...: Format arguments.
- *
- * Return: Always 1.
  */
 #define warn_errno(fmt, ...) warn_errno2(errno, fmt, ##__VA_ARGS__)
 
@@ -68,8 +64,6 @@ extern log_vwritef_fn log_vwritef;
  * @e: Error number.
  * @fmt: printf-style format string.
  * @...: Format arguments.
- *
- * Return: Always 1.
  */
 #define warn_errno2(e, fmt, ...) __log_warn(strerror(e), fmt, ##__VA_ARGS__)
 
@@ -78,8 +72,6 @@ extern log_vwritef_fn log_vwritef;
  * @e: libusb error number.
  * @fmt: printf-style format string.
  * @...: Format arguments.
- *
- * Return: Always 1.
  */
 #define warn_libusb(e, fmt, ...) \
 	__log_warn(libusb_strerror(e), fmt, ##__VA_ARGS__)
@@ -88,8 +80,6 @@ extern log_vwritef_fn log_vwritef;
  * macro error - Write an error message to stderr.
  * @fmt: printf-style format string.
  * @...: Format arguments.
- *
- * Return: Always 1.
  */
 #define error(fmt, ...) __log_error(NULL, fmt, ##__VA_ARGS__)
 
@@ -97,8 +87,6 @@ extern log_vwritef_fn log_vwritef;
  * macro error_errno - Write an error with the current errno description.
  * @fmt: printf-style format string.
  * @...: Format arguments.
- *
- * Return: Always 1.
  */
 #define error_errno(fmt, ...) error_errno2(errno, fmt, ##__VA_ARGS__)
 
@@ -107,8 +95,6 @@ extern log_vwritef_fn log_vwritef;
  * @e: Error number.
  * @fmt: printf-style format string.
  * @...: Format arguments.
- *
- * Return: Always 1.
  */
 #define error_errno2(e, fmt, ...) __log_error(strerror(e), fmt, ##__VA_ARGS__)
 
@@ -117,8 +103,6 @@ extern log_vwritef_fn log_vwritef;
  * @e: libusb error number.
  * @fmt: printf-style format string.
  * @...: Format arguments.
- *
- * Return: Always 1.
  */
 #define error_libusb(e, fmt, ...) \
 	__log_error(libusb_strerror(e), fmt, ##__VA_ARGS__)
@@ -177,9 +161,9 @@ extern log_vwritef_fn log_vwritef;
 
 void __log_record(const char *func, const char *fmt, ...) attr_printf(2, 3);
 
-int __log_warn(const char *hint, const char *fmt, ...) attr_printf(2, 3);
+void __log_warn(const char *hint, const char *fmt, ...) attr_printf(2, 3);
 
-int __log_error(const char *hint, const char *fmt, ...) attr_printf(2, 3);
+void __log_error(const char *hint, const char *fmt, ...) attr_printf(2, 3);
 
 void __log_die(const char *hint, const char *fmt, ...) attr_printf(2, 3)
 						       attr_noreturn;
