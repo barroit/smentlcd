@@ -17,5 +17,6 @@ The smentlcd documentation
    lib/log.rst
    lib/parse_argv.rst
    lib/rio.rst
+   lib/strbuf.rst
    lib/strtox.rst
    lib/xalloc.rst

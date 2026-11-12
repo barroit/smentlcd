@@ -69,11 +69,11 @@ struct abbrev {
 
 static void param_show_help(struct pa_ctx *ctx, FILE *stream);
 
-static struct strbuf path = SB_INIT;
+static struct strbuf path = SB_INIT();
 
 static char *fmt_cli_name(struct pa_opt *opt, uint64_t flags)
 {
-	struct strbuf sb = SB_INIT;
+	struct strbuf sb = SB_INIT();
 
 	if (flags & OPT_SHORT)
 		sb_writef(&sb, "flag -%c", opt->alias);
@@ -262,7 +262,7 @@ static void assign_pick(struct pa_opt *opt, const char *arg, uint64_t flags)
 {
 	const char **p = opt->val;
 	const char **options = (const char **)opt->ext;
-	struct strbuf sb = SB_INIT;
+	struct strbuf sb = SB_INIT();
 
 	if (flags & OPT_UNSET)
 		*p = NULL;
