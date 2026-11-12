@@ -90,7 +90,7 @@ static int parse_integer(const char *str, int base, unsigned long long *res,
 	if (base == 0)
 		base = probe_radix(str);
 
-	if (has_hex_prefix(str))
+	if (base == 16 && has_hex_prefix(str))
 		str += 2;
 
 	err = __parse_integer(str, base, -1, res);
