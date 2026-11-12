@@ -1,3 +1,5 @@
+.. SPDX-License-Identifier: GPL-3.0-or-later
+
 =====
 rio.h
 =====
@@ -5,31 +7,15 @@ rio.h
 ``rio`` provides wrappers for I/O operations that retry when interrupted by a
 signal.
 
-Functions
----------
-
-``rread(fd, buf, count)``
-	Read up to ``count`` bytes from ``fd`` into ``buf``.
-
-``rwrite(fd, buf, count)``
-	Write up to ``count`` bytes from ``buf`` to ``fd``.
-
-``rftruncate(fd, length)``
-	Truncate the file referenced by ``fd`` to ``length`` bytes.
-
-Interruption handling
+Interruption Handling
 ---------------------
 
 All functions retry the underlying system call when it fails with ``EINTR``.
 
-Other errors are returned directly.
+Other errors are returned directly, with ``errno`` set by the underlying system
+call.
 
-Return value
-------------
+API Reference
+-------------
 
-``rread()`` and ``rwrite()`` return the number of bytes transferred, or -1 on
-failure.
-
-``rftruncate()`` returns zero on success, or -1 on failure.
-
-On failure, ``errno`` is set by the underlying system call.
+.. kernel-doc:: /include/rio.h
