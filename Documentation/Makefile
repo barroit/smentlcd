@@ -9,7 +9,7 @@ sphinx-autobuild += --conf-dir sphinx
 .PHONY: live html man info help
 
 live:
-	$(sphinx-autobuild) --builder html . build/html
+	$(sphinx-autobuild) -q --builder html . build/html
 
 html man info help:
-	$(sphinx-build) --builder $@ . build/$@
+	$(sphinx-build) -q --builder $@ . build/$@

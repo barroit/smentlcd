@@ -32,7 +32,7 @@ atexit_routine_t atexit_pop(void);
 /**
  * atexit_setup() - Register the exit handler.
  *
- * Registers the exit handler using the standard library's atexit().
+ * Register the exit handler using the standard library's atexit().
  */
 void atexit_setup(void);
 

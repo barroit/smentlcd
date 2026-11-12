@@ -27,7 +27,7 @@
  * @name: Base macro name.
  * @...: Arguments to pass.
  *
- * Appends the argument count to @name before invocation.
+ * Append the argument count to @name before invocation.
  */
 #define CALL(name, ...) __CALL(name, ARGC(__VA_ARGS__), ##__VA_ARGS__)
 #define __CALL(name, ...) ___CALL(name, __VA_ARGS__)

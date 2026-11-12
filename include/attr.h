@@ -35,9 +35,9 @@
 #define attr_noreturn __attribute__((__noreturn__))
 
 /**
- * macro attr_pure - Mark a function as having no observable side effects.
+ * macro attr_pure - Mark a function that has no side effects.
  *
- * The function may read memory but must not modify observable state.
+ * The function may read memory but must not modify it.
  */
 #define attr_pure __attribute__((__pure__))
 
@@ -84,7 +84,7 @@
  * macro attr_read_only - Mark a pointer argument as read-only.
  * @...: Pointer argument index and optional size argument index.
  *
- * The attribute is omitted if the compiler does not support it.
+ * This attribute is omitted if the compiler does not support it.
  */
 # define attr_read_only(...) \
 	 __attribute__((__access__(__read_only__, __VA_ARGS__)))
@@ -104,7 +104,7 @@
 /**
  * macro attr_always_used - Require the compiler to emit a function or variable.
  *
- * Prevents the compiler from discarding the declaration as unused.
+ * Prevent the compiler from discarding the declaration as unused.
  */
 #define attr_always_used __attribute__((__used__))
 
@@ -117,7 +117,7 @@
 /**
  * macro attr_weak - Declare a symbol as weak.
  *
- * A strong definition may override the symbol.
+ * A strong definition of the same symbol takes precedence at link time.
  */
 #define attr_weak __attribute__((weak))
 

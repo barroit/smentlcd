@@ -24,3 +24,24 @@ API Reference
 -------------
 
 .. kernel-doc:: /include/list.h
+   :symbols: LIST_HEAD, LIST_HEAD_INIT
+   :module: list_macro
+
+.. kernel-doc:: /include/list.h
+   :symbols: list_head,
+             list_head_init,
+             list_add,
+             list_add_tail,
+             list_del,
+             list_is_first,
+             list_is_last,
+             list_is_head,
+             list_is_empty,
+             list_foreach_entry,
+             list_foreach_entry_safe,
+             list_first_entry,
+             list_last_entry,
+             list_next_entry,
+             list_foreach,
+             list_entry_is_head,
+             list_entry
