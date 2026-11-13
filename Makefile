@@ -24,8 +24,8 @@ define mv_stale
 	{ mv $(1) $(2) && touch $(2); }
 endef
 
-include scripts/Makefile.probe
-include scripts/Makefile.kconfig
+include makefile/probe
+include makefile/kconfig
 
 ifneq ($(on_stage3),)
   # We're compiling/linking.
@@ -47,9 +47,9 @@ ifneq ($(on_stage3),)
   SERVICE != test $$(cat build/probe/host/id) = linux && printf systemd
 endif
 
-include scripts/Makefile.flags
-include scripts/Makefile.install
-include scripts/Makefile.develop
+include makefile/flags
+include makefile/install
+include makefile/develop
 
 lib-obj-y += build/lib/atexit.o \
 	     build/lib/list.o \
@@ -90,13 +90,13 @@ ifeq ($(CC_HAS_STRCHRNUL),)
   lib-obj-y += build/lib/patch/strchrnul.o
 endif
 
-include scripts/Makefile.daemon
-include scripts/Makefile.ctl
-include scripts/Makefile.command
+include makefile/daemon
+include makefile/ctl
+include makefile/command
 
 ifneq ($(or $(print_db),$(CONFIG_ENABLE_TEST)),)
-  include scripts/Makefile.unitest
-  include scripts/Makefile.cmdtest
+  include makefile/unitest
+  include makefile/cmdtest
 endif
 
 -include $(lib-obj-y:.o=.d1)
