@@ -37,12 +37,17 @@ API Reference
 -------------
 
 .. kernel-doc:: /include/strbuf.h
-   :symbols: SB_ALLOC, SB_PREALLOC, SB_INIT, SB_INIT_PREALLOC
-   :module: strbuf_macro
+   :symbols: strbuf
 
 .. kernel-doc:: /include/strbuf.h
-   :symbols: strbuf,
-	     sb_init,
+   :module: strbuf_init_macro
+   :symbols: SB_INIT, SB_INIT_PREALLOC
+
+.. kernel-doc:: /include/strbuf.h
+   :symbols: SB_ALLOC, SB_PREALLOC
+
+.. kernel-doc:: /include/strbuf.h
+   :symbols: sb_init,
 	     sb_destroy,
 	     sb_reinit,
 	     sb_chop,

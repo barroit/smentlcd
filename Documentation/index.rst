@@ -11,6 +11,7 @@ The smentlcd documentation
    lib/atexit.rst
    lib/attr.rst
    lib/barrier.rst
+   lib/calc.rst
    lib/compiler.rst
    lib/cpp.rst
    lib/list.rst
@@ -18,5 +19,8 @@ The smentlcd documentation
    lib/parse_argv.rst
    lib/rio.rst
    lib/strbuf.rst
+   lib/strlist.rst
    lib/strtox.rst
+   lib/strutil.rst
+   lib/unicode.rst
    lib/xalloc.rst
