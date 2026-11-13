@@ -1,27 +1,38 @@
 .. SPDX-License-Identifier: GPL-3.0-or-later
 
 ==========================
-The smentlcd documentation
+The smentlcd Documentation
 ==========================
+
+This is the top level of the smentlcd's documentation tree.
+
+User Manual
+-----------
 
 .. toctree::
    :maxdepth: 1
 
-   lib/ansi.rst
-   lib/atexit.rst
-   lib/attr.rst
-   lib/barrier.rst
-   lib/calc.rst
-   lib/compiler.rst
-   lib/cpp.rst
-   lib/list.rst
-   lib/log.rst
-   lib/log_nb.rst
-   lib/parse_argv.rst
-   lib/rio.rst
-   lib/strbuf.rst
-   lib/strlist.rst
-   lib/strtox.rst
-   lib/strutil.rst
-   lib/unicode.rst
-   lib/xalloc.rst
+   user-manual/input
+   user-manual/install
+
+Shared Infrastructure
+---------------------
+
+These components are reused across repositories and continue to evolve. Some
+functionality may be unused; this is expected and should be retained.
+
+.. toctree::
+   :maxdepth: 1
+
+   build-system/index
+   core-api/index
+   test/index
+
+Repository Specific Component
+-----------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   smentlcd-api/index
+   program/index
