@@ -16,6 +16,7 @@ The smentlcd documentation
    lib/cpp.rst
    lib/list.rst
    lib/log.rst
+   lib/log_nb.rst
    lib/parse_argv.rst
    lib/rio.rst
    lib/strbuf.rst

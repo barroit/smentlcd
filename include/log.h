@@ -28,11 +28,6 @@ extern char *strerror(int errnum);
 extern const char *libusb_strerror(int errcode);
 extern const char *stbi_failure_reason(void);
 
-/*
- * var log_vwritef - Output handler for log_writef() and logging macros.
- *
- * Defaults to __log_vwritef(). Assign another handler to customize output.
- */
 extern log_vwritef_fn log_vwritef;
 
 /**

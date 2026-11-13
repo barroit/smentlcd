@@ -17,6 +17,15 @@ Messages have the following format::
 
 ``prefix`` and ``hint`` are optional. Each message ends with a newline.
 
+Output Backend
+--------------
+
+.. c:var:: log_vwritef_fn log_vwritef
+
+   Output handler for log_writef() and logging macros.
+
+   Defaults to __log_vwritef(). Assign another handler to customize output.
+
 API Reference
 -------------
 
