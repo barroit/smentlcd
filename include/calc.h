@@ -45,7 +45,7 @@
 	(a) * (b);				\
 })
 
-#define add_or_add(a, b)			\
+#define add_or_die(a, b)			\
 ({						\
 	if (unlikely(add_is_overflow(a, b)))	\
 		bug("%" PRIuMAX " + %" PRIuMAX	\
