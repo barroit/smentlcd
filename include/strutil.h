@@ -6,18 +6,36 @@
 #ifndef STRUTIL_H
 #define STRUTIL_H
 
-/*
- * Skip s2 if it is a prefix of s1. Return the remainder of s1 on a match,
- * or NULL otherwise. An empty s2 matches and returns s1.
+/**
+ * str_skip() - Skip a matching prefix from a string.
+ * @s1: String to inspect.
+ * @s2: Prefix to match.
+ *
+ * An empty @s2 always matches.
+ *
+ * Return: Pointer to the remainder of @s1, or NULL on mismatch.
  */
 const char *str_skip(const char *s1, const char *s2);
 
-/*
- * Like strskip(), but return 0 and store the remainder in *res on a match.
- * Return -1 on a mismatch without changing *res.
+/**
+ * str_skip2() - Skip a matching prefix and store the remainder.
+ * @s1: String to inspect.
+ * @s2: Prefix to match.
+ * @res: Pointer to receive the remainder.
+ *
+ * An empty @s2 always matches. Leave @res unchanged on mismatch.
+ *
+ * Return: Zero on success, or -1 on mismatch.
  */
 int str_skip2(const char *s1, const char *s2, const char **res);
 
+/**
+ * str_seek_suffix() - Find the suffix after the last occurrence of a character.
+ * @filename: String to inspect.
+ * @after: Character preceding the suffix.
+ *
+ * Return: Pointer to the suffix, or NULL if not found or empty.
+ */
 const char *str_seek_suffix(const char *filename, char after);
 
 #endif /* STRUTIL_H */
