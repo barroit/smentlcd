@@ -3,6 +3,7 @@
 {
    "files.associations": {
       "**/Makefile.*": "makefile",
+      "**/patch/*": "plaintext",
       "**/*.awk": "plaintext",
    },
    "search.exclude": {

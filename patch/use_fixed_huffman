@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 --- a/libdeflate/lib/deflate_compress.c
 +++ b/libdeflate/lib/deflate_compress.c
 @@ -1803,9 +1803,7 @@

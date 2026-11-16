@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+--- a/kconfiglib/kconfiglib.py
++++ b/kconfiglib/kconfiglib.py
+@@ -1855,12 +1855,6 @@
+                 if name in self.syms:
+                     sym = self.syms[name]
+ 
+-                    if sym.orig_type is STRING:
+-                        match = _conf_string_match(val)
+-                        if not match:
+-                            continue
+-                        val = unescape(match.group(1))
+-
+                     self.syms[name]._old_val = val
+                 else:
+                     # Flag that the symbol no longer exists, in
+@@ -1884,11 +1878,18 @@
+     def _old_vals_contents(self):
+         # _write_old_vals() helper. Returns the contents to write as a string.
+ 
+-        # Temporary list instead of generator makes this a bit faster
+-        return "".join([
+-            sym.config_string for sym in self.unique_defined_syms
+-                if not (sym.orig_type in _BOOL_TRISTATE and not sym.tri_value)
+-        ])
++        chunks = []
++        for sym in self.unique_defined_syms:
++            if sym.orig_type in _BOOL_TRISTATE and not sym.tri_value:
++                continue
++
++            config = sym.config_string
++            if sym.orig_type is STRING and config:
++                config = "{}{}={}\n".format(
++                    self.config_prefix, sym.name, sym.str_value)
++            chunks.append(config)
++
++        return "".join(chunks)
+ 
+     def node_iter(self, unique_syms=False):
+         """

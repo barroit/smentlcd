@@ -1,5 +1,7 @@
---- a/tapview/tapview	2026-04-21 15:03:44
-+++ b/tapview/tapview	2026-04-21 15:04:04
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+--- a/tapview/tapview
++++ b/tapview/tapview
 @@ -175,7 +175,7 @@
  		    if directive "$line" [Ss][Kk][Ii][Pp]
  		    then

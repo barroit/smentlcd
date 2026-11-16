@@ -3,6 +3,7 @@
 [submodule "kconfiglib"]
 	path = kconfiglib
 	url = git@github.com:zephyrproject-rtos/Kconfiglib.git
+	ignore = dirty
 
 [submodule "tapview"]
 	path = tapview
