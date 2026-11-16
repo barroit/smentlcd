@@ -11,13 +11,13 @@ MAKEFLAGS += -rR
 
 build/$(name): build/$(name)d build/$(name)ctl
 
-stage3_tagets := %.o %/d.h %/entrybuild/$(name)% build/t/unit/% \
+build_targets := %.o %/d.h %/entry build/$(name)% build/t/unit/% \
 		 dev_% .dev_% install% uninstall% miku
-current_tagets := $(or $(MAKECMDGOALS),miku)
+current_targets := $(or $(MAKECMDGOALS),miku)
 
 print_db := $(findstring p,$(firstword $(MAKEFLAGS)))
 no_print_db := $(if $(print_db),,1)
-on_stage3 := $(and $(no_print_db),$(filter $(stage3_tagets),$(current_tagets)))
+on_build := $(and $(no_print_db),$(filter $(build_targets),$(current_targets)))
 
 define mv_stale
 	test -f $(2) && cmp -s $(1) $(2) && test -z "$(3)" || \
@@ -27,7 +27,7 @@ endef
 include mbuild/probe
 include mbuild/kconfig
 
-ifneq ($(on_stage3),)
+ifneq ($(on_build),)
   # We're compiling/linking.
 
   include build/probe/cc/features
@@ -42,7 +42,7 @@ ifneq ($(on_stage3),)
   LD != cat build/probe/ld/id
 
   USE_GCC != test $$(cat build/probe/cc/id) = gcc && printf y
-  USE_CLANG != test $$(cat build/probe/cc/id) = clang && printf 
+  USE_CLANG != test $$(cat build/probe/cc/id) = clang && printf y
 
   SERVICE != test $$(cat build/probe/host/id) = linux && printf systemd
 endif
@@ -100,6 +100,7 @@ ifneq ($(or $(print_db),$(CONFIG_ENABLE_TEST)),)
 endif
 
 -include $(lib-obj-y:.o=.d1)
+-include $(ctl-obj-y:.o=.d1)
 -include $(daemon-obj-y:.o=.d1)
 
 build/$(name)d: build/daemon/main/entry
@@ -112,7 +113,7 @@ $(lib-obj-y):
 
 build/%.o: %.c \
 	   include/generated/build.h include/generated/features.h \
-	   build/.flags.cc build/.flags.ld
+	   build/.flags.cc
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) $(addprefix -include ,$(filter include/generated/% \
 						       include/ctl/% \

@@ -91,7 +91,17 @@ ifeq ($(SERVICE),systemd)
   DAEMON_LDFLAGS += -ludev
 endif
 
-build/.flags.%: .force
+build/.flags.cc: .force
 	@trap 'rm -f .tmp-$$$$' EXIT && \
 	printf '%s\n' "$(CFLAGS)" >.tmp-$$$$ && \
+	$(call mv_stale,.tmp-$$$$,$(@),)
+
+build/.flags.ld: .force
+	@trap 'rm -f .tmp-$$$$' EXIT && \
+	printf '%s\n' "$(LDFLAGS)" >.tmp-$$$$ && \
+	$(call mv_stale,.tmp-$$$$,$(@),)
+
+build/.flags.ld-daemon: .force
+	@trap 'rm -f .tmp-$$$$' EXIT && \
+	printf '%s\n' "$(DAEMON_LDFLAGS)" >.tmp-$$$$ && \
 	$(call mv_stale,.tmp-$$$$,$(@),)
