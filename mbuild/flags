@@ -13,15 +13,7 @@ endif
 
 LDFLAGS += -fuse-ld=$(LD)
 
-ifneq ($(CONFIG_CC_OPTIMIZE_NONE),)
-  CFLAGS += -O0
-else ifneq ($(CONFIG_CC_OPTIMIZE_O1),)
-  CFLAGS += -O1
-else ifneq ($(CONFIG_CC_OPTIMIZE_O2),)
-  CFLAGS += -O2
-else ifneq ($(CONFIG_CC_OPTIMIZE_O3),)
-  CFLAGS += -O3
-endif
+CFLAGS += $(CONFIG_CC_OPTIMIZE_LEVEL)
 
 ifneq ($(CONFIG_DEBUG_INFO_DWARF4),)
   CFLAGS += -gdwarf-4

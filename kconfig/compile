@@ -21,6 +21,13 @@ config CC_OPTIMIZE_O3
 
 endchoice # Compiler optimization
 
+config CC_OPTIMIZE_LEVEL
+	string
+	default -O0 if CC_OPTIMIZE_NONE
+	default -O1 if CC_OPTIMIZE_O1
+	default -O2 if CC_OPTIMIZE_O2
+	default -O3 if CC_OPTIMIZE_O3
+
 config ENABLE_DEBUG
 	bool "Debug program"
 
