@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+.PHONY: bootstrap
+
 bootstrap: build/probe/cc/program \
 	   build/probe/cc/id \
 	   build/probe/cc/version \
