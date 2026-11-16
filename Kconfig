@@ -4,6 +4,6 @@ mainmenu "$(repo-name)/$(host-arch)-$(host-name) $(repo-version) Configuration"
 
 $(warn-off)
 
-source "scripts/Kconfig.compile"
+source "kconfig/compile"
 
-source "scripts/Kconfig.runtime"
+source "kconfig/runtime"
