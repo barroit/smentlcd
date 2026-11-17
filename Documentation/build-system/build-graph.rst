@@ -36,7 +36,7 @@ include/generated/features.h, and build/.flags.cc.
 
 The compiler also injects the kconfig generated include/generated/config.h into
 every source file. The build/%.o rule doesn't depend on this header. See
-:doc:`incremental-build` for configuration dependencies.
+:ref:`build-system/incremental-build:Configuration Dependencies`.
 
 Generated command headers can add dependencies. Their generation is described
 in :doc:`command-generation`.
