@@ -11,7 +11,8 @@ MAKEFLAGS += -rR
 
 build/$(name): build/$(name)d build/$(name)ctl
 
-build_targets := %.o %/d.h %/entry build/$(name)% build/t/unit/% \
+build_targets := build/.flags.% build/%.o include/%/d.h \
+		 build/%/entry build/$(name)% build/t/unit/% \
 		 dev_% .dev_% install% uninstall% miku
 current_targets := $(or $(MAKECMDGOALS),miku)
 
@@ -28,8 +29,6 @@ include mbuild/probe
 include mbuild/kconfig
 
 ifneq ($(on_build),)
-  # We're compiling/linking.
-
   include build/probe/cc/features
   include build/probe/ld/features
 
