@@ -20,7 +20,7 @@ process.
 
 When ``CONFIG_WARN_LARGE_ALLOC`` is enabled, ``xmalloc()``, ``xcalloc()``,
 ``xrealloc()``, and ``xreallocarray()`` report allocations greater than or
-equal to ``CONFIG_LARGE_ALLOC`` without aborting.
+equal to ``CONFIG_LARGE_ALLOC_THRESHOLD`` without aborting.
 
 API Reference
 -------------

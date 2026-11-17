@@ -39,12 +39,13 @@ static inline void assert_allocated(const char *file, int line,
 static inline void warn_large_alloc(const char *file, int line,
 				    const char *func, uintmax_t n)
 {
-	if (n < CONFIG_LARGE_ALLOC)
+	if (n < CONFIG_LARGE_ALLOC_THRESHOLD)
 		return;
 
 	log_writef(STDERR_FILENO, NULL, NULL,
 		   "%s:%d,%s(): allocated %" PRIuMAX " bytes exceeds %" PRIuMAX,
-		   file, line, func, n, (uintmax_t)CONFIG_LARGE_ALLOC);
+		   file, line, func, n,
+		   (uintmax_t)CONFIG_LARGE_ALLOC_THRESHOLD);
 }
 #else
 # define warn_large_alloc NOOP

@@ -68,14 +68,18 @@ endchoice # Compress debug information
 
 endif # menuconfig ENABLE_DEBUG
 
-config WARN_LARGE_ALLOC
+menuconfig WARN_LARGE_ALLOC
 	bool "Warn on large allocations"
 	default ENABLE_DEBUG
 
-config LARGE_ALLOC
+if WARN_LARGE_ALLOC
+
+config LARGE_ALLOC_THRESHOLD
 	hex "Large allocation warning threshold"
 	default 0x80000
 	depends on WARN_LARGE_ALLOC
+
+endif # WARN_LARGE_ALLOC
 
 config IGNORE_ANNOT_LEAKS
 	bool "Suppress leak reports for annotated objects"
@@ -89,12 +93,8 @@ config ENABLE_TEST
 	bool "Add test targets"
 	default ENABLE_DEBUG
 
-menu "List options"
-
 config VALIDATE_LIST_MUTATION
 	bool "Validate list modifications"
 	default ENABLE_DEBUG
-
-endmenu # List options
 
 endmenu # Compile options
