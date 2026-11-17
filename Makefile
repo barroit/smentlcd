@@ -11,7 +11,7 @@ MAKEFLAGS += -rR
 
 build/$(name): build/$(name)d build/$(name)ctl
 
-build_targets := build/.flags.% build/%.o include/%/d.h \
+build_targets := build/.flags.% build/%.o include/%/cmdtab.h \
 		 build/%/entry build/$(name)% build/t/unit/% \
 		 dev_% .dev_% install% uninstall% miku
 current_targets := $(or $(MAKECMDGOALS),miku)
@@ -118,9 +118,6 @@ build/%.o: %.c \
 						       include/ctl/% \
 						       include/daemon/%,$^)) \
 	      -c $< -o $@
-
-%_entry.c: | %.c
-	./scripts/gen-command-entry.sh $(*F) >$@
 
 build/%.d1: build/%.d %.c
 	@./scripts/fixconfig.sh $(shell grep .h: $< | tr -d : | \

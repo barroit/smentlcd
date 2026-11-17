@@ -42,7 +42,7 @@ def print_headers(deps, cmdtree):
 		print_headers(child, cmdtree)
 
 	header = deps[0]
-	print_no_lf(f"include/{header}/d.h: {cmdtree} |")
+	print_no_lf(f"include/{header}/cmdtab.h: {cmdtree} |")
 
 	for item in direct_deps(deps):
 		print_no_lf(f" {item}")
@@ -59,14 +59,14 @@ def print_object_deps(deps):
 	for item in direct_deps(deps):
 		print_no_lf(f" {object_path(item)}")
 
-	print(f": include/{header}/d.h\n")
+	print(f": include/{header}/cmdtab.h\n")
 
 	print_no_lf(f"build/{header}.d1")
 
 	for item in direct_deps(deps):
 		print_no_lf(f" {dependency_path(item)}")
 
-	print(f": include/{header}/d.h\n")
+	print(f": include/{header}/cmdtab.h\n")
 
 def object_path(item):
 	if item.endswith('.c'):

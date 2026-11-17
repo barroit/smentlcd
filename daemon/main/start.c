@@ -120,5 +120,4 @@ int cmd_main_start(int argc, const char **argv)
 	event_start_loop();
 
 	cc_trap();
-	return 0;
 }
