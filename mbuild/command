@@ -14,4 +14,4 @@ build/%/.commands: .force
 	$(call mv_stale,.tmp-$$$$,$(@),)
 
 %_entry.c: | %.c
-	./scripts/cmd-entry.sh $(*F) >$@
+	./scripts/cmd-entry.sh $* >$@
