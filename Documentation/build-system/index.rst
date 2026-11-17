@@ -11,3 +11,4 @@ generation, compilation, and linking.
    :maxdepth: 1
 
    three-stage
+   build-graph
