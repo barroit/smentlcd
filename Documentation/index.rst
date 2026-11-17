@@ -12,8 +12,8 @@ User Manual
 .. toctree::
    :maxdepth: 1
 
-   user-manual/input
    user-manual/install
+   user-manual/input
 
 Shared Infrastructure
 ---------------------

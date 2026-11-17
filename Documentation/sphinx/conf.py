@@ -24,6 +24,10 @@ html_css_files = [
 
 extensions = [
 	'linuxdoc.rstKernelDoc',
+	'sphinx.ext.autosectionlabel',
 ]
 
 kernel_doc_srctree = '..'
+
+autosectionlabel_prefix_document = True
+autosectionlabel_maxdepth = 2
