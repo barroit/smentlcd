@@ -15,11 +15,7 @@ LDFLAGS += -fuse-ld=$(LD)
 
 CFLAGS += $(CONFIG_CC_OPTIMIZE_LEVEL)
 
-ifneq ($(CONFIG_DEBUG_INFO_DWARF4),)
-  CFLAGS += -gdwarf-4
-else ifneq ($(CONFIG_DEBUG_INFO_DWARF5),)
-  CFLAGS += -gdwarf-5
-endif
+CFLAGS += $(CONFIG_DEBUG_INFO_FORMAT)
 
 ifneq ($(CONFIG_ENABLE_DEBUG),)
   CFLAGS += -fno-omit-frame-pointer

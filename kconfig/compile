@@ -3,7 +3,7 @@
 menu "Compile options"
 
 choice
-	prompt "Compiler optimization"
+	prompt "Compiler optimization level"
 	default CC_OPTIMIZE_NONE if ENABLE_DEBUG
 	default CC_OPTIMIZE_O2
 
@@ -22,39 +22,34 @@ config CC_OPTIMIZE_O3
 endchoice # Compiler optimization
 
 config CC_OPTIMIZE_LEVEL
-	string
-	default -O0 if CC_OPTIMIZE_NONE
+	def_string -O0 if CC_OPTIMIZE_NONE
 	default -O1 if CC_OPTIMIZE_O1
 	default -O2 if CC_OPTIMIZE_O2
 	default -O3 if CC_OPTIMIZE_O3
 
-config ENABLE_DEBUG
+menuconfig ENABLE_DEBUG
 	bool "Debug program"
 
-config DEBUG_INFO
-	bool
+if ENABLE_DEBUG
 
 choice
-	prompt "Debug information"
-	depends on ENABLE_DEBUG
+	prompt "Debug information format"
 	default DEBUG_INFO_DWARF5
-
-config DEBUG_INFO_NONE
-	bool "Don't generate debug information"
 
 config DEBUG_INFO_DWARF4
 	bool "Generate DWARF version 4 debug information"
-	select DEBUG_INFO
 
 config DEBUG_INFO_DWARF5
 	bool "Generate DWARF version 5 debug information"
-	select DEBUG_INFO
 
 endchoice # Debug information
 
+config DEBUG_INFO_FORMAT
+	def_string -gdwarf-4 if DEBUG_INFO_DWARF4
+	default -gdwarf-5 if DEBUG_INFO_DWARF5
+
 choice
 	prompt "Compress debug information"
-	depends on DEBUG_INFO
 
 config DEBUG_INFO_COMPRESS_NONE
 	bool "Don't compress debug information"
@@ -70,6 +65,8 @@ config DEBUG_INFO_COMPRESS_ZSTD
 	depends on $(ld-has-feature,COMPRESS_DEBUG_SECTIONS_ZSTD)
 
 endchoice # Compress debug information
+
+endif # menuconfig ENABLE_DEBUG
 
 config WARN_LARGE_ALLOC
 	bool "Warn on large allocations"
