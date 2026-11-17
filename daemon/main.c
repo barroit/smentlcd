@@ -20,7 +20,7 @@ int cmd_main(int argc, const char **argv)
 	int err;
 	pa_command_fn cmd;
 	struct pa_opt opts[] = {
-		CMD_MAIN_CMDS(&cmd),
+		CMD_MAIN_TABLE(&cmd),
 		PA_OPT_END(),
 	};
 

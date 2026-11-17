@@ -27,7 +27,7 @@ int cmd_$name(int argc, const char **argv);
 
 $(sed $sed_cmd_name'extern const char *help_'$name'_\1;|' .tmp-$$)
 
-#define CMD_${class}_CMDS(v) \\
+#define CMD_${class}_TABLE(v) \\
 	PA_OPT_GROUP("$(head -n1 README) - $pretty commands:"), \\
 $(sed -e '$!'$sed_cmd_name"$opt_cmd_name"', \\|' \
       -e '$'$sed_cmd_name"$opt_cmd_name"'|' .tmp-$$)
