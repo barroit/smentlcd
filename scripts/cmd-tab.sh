@@ -10,7 +10,7 @@ class=$(printf '%s' $name | tr '[:lower:]' '[:upper:]')
 pretty=$(printf '%s' $name | cut -d_ -f2- | tr _ ' ')
 
 sed_cmd_name='s|.*/\([^/]*\).c|'
-opt_cmd_name='\tPA_OPT_CMD("\1", v, cmd_'$name'_\1, cmd_'$name'_\1_help)'
+opt_cmd_name='\tPA_OPT_CMD("\1", v, cmd_'$name'_\1, help_'$name'_\1)'
 
 cat >.tmp-$$
 
@@ -25,7 +25,7 @@ cat <<EOF
 $(sed $sed_cmd_name'int cmd_'$name'_\1(int argc, const char **argv);|' .tmp-$$)
 int cmd_$name(int argc, const char **argv);
 
-$(sed $sed_cmd_name'extern const char *cmd_'$name'_\1_help;|' .tmp-$$)
+$(sed $sed_cmd_name'extern const char *help_'$name'_\1;|' .tmp-$$)
 
 #define CMD_${class}_CMDS(v) \\
 	PA_OPT_GROUP("$(head -n1 README) - $pretty commands:"), \\

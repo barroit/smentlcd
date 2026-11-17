@@ -18,7 +18,7 @@ static const char *usage[] = {
 	NULL,
 };
 
-const char *cmd_main_play_help = "play the image";
+const char *help_main_play = "play the image";
 
 int cmd_main_play(int argc, const char **argv)
 {

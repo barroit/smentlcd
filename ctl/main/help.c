@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 
-const char *cmd_main_help_help = "show command usages";
+const char *help_main_help = "show command usages";
 
 int cmd_main_help(int argc, const char **argv)
 {

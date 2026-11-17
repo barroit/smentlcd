@@ -7,7 +7,7 @@
 
 #include "ipc.h"
 
-const char *cmd_main_stat_help = "query device information";
+const char *help_main_stat = "query device information";
 
 int cmd_main_stat(int argc, const char **argv)
 {

@@ -12,7 +12,7 @@
 
 void daemon_exec_req(struct ipc_request *req, struct ipc_response *res);
 
-const char *cmd_main_start_help = "start the daemon process";
+const char *help_main_start = "start the daemon process";
 
 static void error_res(struct ipc_response *res, const char *str)
 {

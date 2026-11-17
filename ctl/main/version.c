@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 
-const char *cmd_main_version_help = "show version information";
+const char *help_main_version = "show version information";
 
 int cmd_main_version(int argc, const char **argv)
 {
