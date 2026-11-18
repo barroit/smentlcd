@@ -14,13 +14,11 @@ install_systemd: install_program
 	       'GROUP="smentlcd", ' \
 	       'MODE="0660", ' | \
 	sudo tee /etc/udev/rules.d/39-smentlcd.rules
-
 	printf 'ATTR{idVendor}=="%04x", ATTR{idProduct}=="%04x"\n' \
 	       $(CONFIG_DEVICE_VID) $(CONFIG_DEVICE_PID) | \
 	sudo tee -a /etc/udev/rules.d/39-smentlcd.rules
 
 	sudo groupadd -f smentlcd
-	sudo usermod -aG smentlcd $$USER
 	sudo udevadm control --reload-rules
 
 	mkdir -p $(HOME)/.config/systemd/user
@@ -32,8 +30,8 @@ install_systemd: install_program
 	systemctl --user daemon-reload
 
 uninstall_systemd:
-	systemctl --user stop smentlcd.service smentlcd.socket
-	systemctl --user disable smentlcd.service smentlcd.socket
+	systemctl --user disable --now smentlcd.socket
+	systemctl --user stop smentlcd.service
 	rm -f $(HOME)/.config/systemd/user/smentlcd.service \
 	      $(HOME)/.config/systemd/user/smentlcd.socket
 	rm -f $(HOME)/.local/bin/$(name)d $(HOME)/.local/bin/$(name)ctl
@@ -41,9 +39,8 @@ uninstall_systemd:
 
 	sudo rm /etc/udev/rules.d/39-smentlcd.rules
 
-	sudo gpasswd -d $$USER smentlcd
-	sudo groupdel smentlcd
 	sudo udevadm control --reload-rules
+	sudo groupdel smentlcd
 
 .PHONY: install_program
 
