@@ -69,7 +69,7 @@ Each generated header contains:
 
 - Declarations for the command entry points.
 - Declarations for the corresponding help message strings.
-- A CMD_*_TABLE(v) macro containing PA_OPT_GROUP and PA_OPT_CMD entries.
+- A ``CMD_*_TABLE(v)`` macro containing PA_OPT_GROUP and PA_OPT_CMD entries.
 
 Commands are grouped with a leading PA_OPT_GROUP entry. The group description is
 generated from the first line of README and the current command path.
@@ -89,7 +89,7 @@ entry point.
 
 For example, ctl/main_entry.c contains:
 
-.. code-block:: text
+.. code-block:: c
 
 	int cmd_main(int, const char **);
 
