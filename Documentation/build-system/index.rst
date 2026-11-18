@@ -13,3 +13,4 @@ generation, compilation, and linking.
    three-stage
    build-graph
    incremental-build
+   command-generation
