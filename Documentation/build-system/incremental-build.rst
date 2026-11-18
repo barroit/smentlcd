@@ -4,18 +4,18 @@
 Incremental Build
 =================
 
-The build system tracks header dependencies, configuration changes, and
-compiler and linker flags to determine which targets need to be rebuilt.
+The build system tracks header dependencies, configuration changes, compiler
+flags, and linker flags to determine which targets need to be rebuilt.
 
 Header Dependencies
 ===================
 
-CFLAGS contains -MMD and -MP. During compilation, -MMD generates build/%.d
-with dependencies on the source itself and included headers. -MP adds empty
-rules for headers so removed headers do not cause missing target errors.
+CFLAGS contains -MMD and -MP. During compilation, -MMD generates build/%.d with
+dependencies on the source itself and non-system headers. -MP adds empty rules
+for headers so removed headers do not cause missing target errors.
 
-The Makefile generates build/%.d1 from build/%.d and includes the .d1 files
-for objects in lib-obj-y, ctl-obj-y, and daemon-obj-y.
+The Makefile generates build/%.d1 from build/%.d and includes the .d1 files for
+objects in lib-obj-y, ctl-obj-y, and daemon-obj-y.
 
 Configuration Dependencies
 ==========================
@@ -31,10 +31,12 @@ include/config/. For example, CONFIG_ENABLE_DEBUG produces:
 The wildcard allows the dependency file to reference configuration headers
 that may not exist.
 
-This script adds these dependencies to ``build/%.d1`` and removes
-include/generated/config.h from the dependency list. Kconfig updates files under
-include/config/ when configuration options change, allowing Make to rebuild
-objects that reference the changed options.
+This script adds these dependencies to build/%.d1 and removes
+include/generated/config.h from the dependency list. This prevents changes to
+the generated configuration header from rebuilding every object.
+
+Kconfig updates files under include/config/ when configuration options change,
+allowing make(1) to rebuild objects that reference the changed options.
 
 Flag Changes
 ============

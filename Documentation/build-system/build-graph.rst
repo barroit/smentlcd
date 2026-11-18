@@ -37,7 +37,7 @@ before compilation.
 Each object depends on its source, include/generated/build.h,
 include/generated/features.h, and build/.flags.cc.
 
-The compiler also injects the kconfig generated include/generated/config.h into
+The compiler also injects the Kconfig generated include/generated/config.h into
 every source file. The build/%.o rule doesn't depend on this header. See
 :ref:`build-system/incremental-build:Configuration Dependencies`.
 
@@ -78,5 +78,4 @@ build/libusb.a and build/libdeflate.a are hard links to external libraries
 built under libusb/ and libdeflate/.
 
 These libraries must be built beforehand using ``scripts/build-libusb.sh`` and
-``scripts/build-libdeflate.sh``. Make reports an error if either required
-library is missing.
+``scripts/build-libdeflate.sh``.

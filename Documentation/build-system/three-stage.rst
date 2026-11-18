@@ -177,7 +177,7 @@ Configuration Files
 These targets produce the following files:
 
 - build/.config
-	The kconfig state file.
+	The Kconfig state file.
 
 - include/config/auto.conf
 	The config file in a format readable by make(1).
