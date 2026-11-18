@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: docs
+
+on:
+   push:
+      branches:
+         - master
+      paths:
+         - Documentation/**
+   workflow_dispatch:
+
+permissions:
+   contents: read
+   pages:    write
+   id-token: write
+
+concurrency:
+   group: pages
+   cancel-in-progress: false
+
+jobs:
+   build:
+      runs-on: ubuntu-26.04
+      steps:
+         - uses: actions/checkout@v7
+           with:
+              path: master
+
+         - uses: actions/setup-python@v7
+           with:
+              python-version: 3.15
+
+         - run: pip install sphinx==9.2.0
+         - run: pip install furo
+         - run: pip install git+https://github.com/barroit/linuxdoc.git
+
+         - run: make html
+           working-directory: master/Documentation
+
+         - uses: actions/upload-pages-artifact@v5
+           with:
+              path: master/Documentation/build/html
+
+   deploy:
+      needs:   build
+      runs-on: ubuntu-26.04
+      environment:
+         name: github-pages
+         url:  ${{ steps.deployment.outputs.page_url }}
+      steps:
+         - id:   deployment
+           uses: actions/deploy-pages@v4
