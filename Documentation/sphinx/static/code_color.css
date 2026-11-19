@@ -3,19 +3,7 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
-body[data-theme='dark'] {
-	--highlight-theme: dark;
-}
-
-@media (prefers-color-scheme: dark) {
-
-body[data-theme='auto'] {
-	--highlight-theme: dark;
-}
-
-} /* @media (prefers-color-scheme: dark)  */
-
-@container style(--highlight-theme: dark) {
+@container style(--dark-mode: y) {
 
 /* Reset token colors supplied by the Sphinx/Pygments theme */
 .highlight [class] {
@@ -55,4 +43,4 @@ body[data-theme='auto'] {
 	color: #acc4a0 !important;
 }
 
-} /* @container style(--highlight-theme: dark) */
+} /* @container style(--dark-mode: y) */

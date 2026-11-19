@@ -19,7 +19,9 @@ html_static_path = [
 ]
 
 html_css_files = [
+	'dark_mode.css',
 	'code_color.css',
+	'code_tab.css',
 	'layout.css',
 ]
 
@@ -27,9 +29,13 @@ extensions = [
 	'linuxdoc.rstKernelDoc',
 	'sphinx.ext.autosectionlabel',
 	'sphinx_copybutton',
+	'sphinx_tabs.tabs',
 ]
 
 kernel_doc_srctree = '..'
 
 autosectionlabel_prefix_document = True
 autosectionlabel_maxdepth = 2
+
+sphinx_tabs_disable_css_loading = True
+sphinx_tabs_disable_tab_closing = True
