@@ -8,6 +8,7 @@ on:
          - master
       paths:
          - Documentation/**
+         - .github/workflows/docs.yml
    workflow_dispatch:
 
 permissions:
@@ -34,6 +35,8 @@ jobs:
          - run: pip install sphinx==9.2.0
          - run: pip install furo
          - run: pip install git+https://github.com/barroit/linuxdoc.git
+         - run: pip install sphinx-copybutton
+         - run: pip install sphinx-tabs
 
          - run: make html
            working-directory: master/Documentation
