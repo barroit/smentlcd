@@ -26,6 +26,7 @@ html_css_files = [
 extensions = [
 	'linuxdoc.rstKernelDoc',
 	'sphinx.ext.autosectionlabel',
+	'sphinx_copybutton',
 ]
 
 kernel_doc_srctree = '..'
