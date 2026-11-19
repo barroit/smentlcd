@@ -6,72 +6,102 @@ Program Installation
 
 This document describes how to build and install smentlcd on Ubuntu 26.04.
 
-Prerequisites
-=============
+.. caution::
+
+	After installation:
+
+	- Log out of the current session and log back in.
+	- If the device is already plugged in, unplug and replug it.
+
+Quick Installation
+==================
+
+Run all installation commands at once:
+
+.. tabs::
+
+	.. code-tab:: shell HTTPS
+
+		sudo apt install autoconf libtool gcc make cmake \
+				 libudev-dev libsystemd-dev && \
+		git clone https://github.com/barroit/smentlcd.git && \
+		cd smentlcd && \
+		git -c url.https://github.com/.insteadOf=git@github.com: \
+		    -c url.https://gitlab.com/.insteadOf=git@gitlab.com: \
+		    submodule update --init && \
+		./scripts/build-libdeflate.sh && \
+		./scripts/build-libusb.sh && \
+		cat patch/* | patch -p1 && \
+		make alldefconfig && \
+		make -j && \
+		make install && \
+		sudo usermod -aG smentlcd $USER && \
+		systemctl --user enable --now smentlcd.socket
+
+	.. code-tab:: shell SSH
+
+		sudo apt install autoconf libtool gcc make cmake \
+				 libudev-dev libsystemd-dev && \
+		git clone git@github.com:barroit/smentlcd.git && \
+		cd smentlcd && \
+		git submodule update --init && \
+		./scripts/build-libdeflate.sh && \
+		./scripts/build-libusb.sh && \
+		cat patch/* | patch -p1 && \
+		make alldefconfig && \
+		make -j && \
+		make install && \
+		sudo usermod -aG smentlcd $USER && \
+		systemctl --user enable --now smentlcd.socket
+
+Step-by-Step Installation
+=========================
 
 Install the required packages:
 
-.. code-block:: console
+.. code-block:: shell
 
 	sudo apt install autoconf libtool gcc make cmake \
 			 libudev-dev libsystemd-dev
 
-Obtaining the Source
-====================
+Clone the repository:
 
-Create a directory for the repository:
+.. tabs::
 
-.. code-block:: console
+	.. code-tab:: shell HTTPS
 
-	cd
-	mkdir git
-	cd git
+		git clone https://github.com/barroit/smentlcd.git
+		cd smentlcd
 
-Clone the repository via SSH:
+	.. code-tab:: shell SSH
 
-.. code-block:: console
+		git clone git@github.com:barroit/smentlcd.git
+		cd smentlcd
 
-	git clone git@github.com:barroit/smentlcd.git
+Initialize submodules:
 
-Alternatively, use HTTPS:
+.. tabs::
 
-.. code-block:: console
+	.. code-tab:: shell HTTPS
 
-	git clone https://github.com/barroit/smentlcd.git
+		git -c url.https://github.com/.insteadOf=git@github.com: \
+		    -c url.https://gitlab.com/.insteadOf=git@gitlab.com: \
+		    submodule update --init
 
-Enter the repository:
+	.. code-tab:: shell SSH
 
-.. code-block:: console
+		git submodule update --init
 
-	cd smentlcd
+Build the libraries:
 
-Initialize submodules, for SSH access, use:
-
-.. code-block:: console
-
-	git submodule update --init
-
-For HTTPS access, use:
-
-.. code-block:: console
-
-	git -c url.https://github.com/.insteadOf=git@github.com: \
-	    -c url.https://gitlab.com/.insteadOf=git@gitlab.com: \
-	    submodule update --init
-
-Building
-========
-
-Build the bundled libraries:
-
-.. code-block:: console
+.. code-block:: shell
 
 	./scripts/build-libdeflate.sh
 	./scripts/build-libusb.sh
 
 Apply the patches:
 
-.. code-block:: console
+.. code-block:: shell
 
 	cat patch/* | patch -p1
 
@@ -80,51 +110,48 @@ Apply the patches:
 	Do not skip this step. The build will succeed without these patches, but
 	produce an incorrect binary.
 
-Generate the default configuration and build the program:
+Generate the release-ready configuration and build the daemon and controller:
 
-.. code-block:: console
+.. code-block:: shell
 
 	make alldefconfig
 	make -j
 
-Deployment
-==========
+Install the daemon and controller:
 
-Install the program to $HOME/.local/bin:
-
-.. code-block:: console
+.. code-block:: shell
 
 	make install
 
 .. note::
 
-	If the device is already plugged in, unplug and replug it after
-	installation.
+	By default, the daemon and controller are installed in
+	``$HOME/.local/bin``.
 
-Add the current user to the smentlcd group created by *install* target:
+Add the current user to the ``smentlcd`` group created by the *install* target:
 
-.. code-block:: console
+.. code-block:: shell
 
 	sudo usermod -aG smentlcd $USER
 
 Enable and start the user socket:
 
-.. code-block:: console
+.. code-block:: shell
 
 	systemctl --user enable --now smentlcd.socket
 
 Verification
 ============
 
-Add $HOME/.local/bin to PATH so the shell can find the installed smentlcdctl
+Add ``$HOME/.local/bin`` to PATH so the shell can find the installed smentlcdctl
 executable:
 
-.. code-block:: console
+.. code-block:: shell
 
 	export PATH=$HOME/.local/bin:$PATH
 
 Check the device status:
 
-.. code-block:: console
+.. code-block:: shell
 
 	smentlcdctl stat
