@@ -3,40 +3,56 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
+body[data-theme='dark'] {
+	--highlight-theme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+
+body[data-theme='auto'] {
+	--highlight-theme: dark;
+}
+
+} /* @media (prefers-color-scheme: dark)  */
+
+@container style(--highlight-theme: dark) {
+
 /* Reset token colors supplied by the Sphinx/Pygments theme */
-body[data-theme='dark'] .highlight [class] {
+.highlight [class] {
 	color: #a8a8a8 !important;
 }
 
 /* Format placeholders */
-body[data-theme='dark'] .highlight .si {
+.highlight .si {
 	color: #ce9178 !important;
 }
 
 /* Control keywords and primitive types */
-body[data-theme='dark'] .highlight .k,
-body[data-theme='dark'] .highlight .kd,
-body[data-theme='dark'] .highlight .kt {
+.highlight .k,
+.highlight .kd,
+.highlight .kt {
 	color: #569cd6 !important;
 }
 
 /* CSS selectors and JSX tags */
-body[data-theme='dark'] .highlight-css .highlight .nt,
-body[data-theme='dark'] .highlight-css .highlight .nc,
-body[data-theme='dark'] .highlight-css .highlight .nn,
-body[data-theme='dark'] .highlight-css .highlight .nd,
-body[data-theme='dark'] .highlight-jsx .highlight .nt,
-body[data-theme='dark'] .highlight-tsx .highlight .nt {
+.highlight-css .highlight .nt,
+.highlight-css .highlight .nc,
+.highlight-css .highlight .nn,
+.highlight-css .highlight .nd,
+.highlight-jsx .highlight .nt,
+.highlight-tsx .highlight .nt {
 	color: #569cd6 !important;
 }
 
 /* CMake commands */
-body[data-theme='dark'] .highlight-cmake .highlight .nb {
+.highlight-cmake .highlight .nb {
 	color: #569cd6 !important;
 }
 
 /* Decimal and integer numbers */
-body[data-theme='dark'] .highlight .mi,
-body[data-theme='dark'] .highlight .mf {
+.highlight .mi,
+.highlight .mf {
 	color: #acc4a0 !important;
 }
+
+} /* @container style(--highlight-theme: dark) */
