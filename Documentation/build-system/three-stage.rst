@@ -53,7 +53,7 @@ Compiler Feature Detection
 ``scripts/probe-cc-features.sh`` defines the features to test. Tests come in two
 forms:
 
-.. code-block:: text
+.. code-block:: shell
 
 	probe_feature <<'EOF' &
 	CC_HAS_GZ_ZLIB
@@ -62,7 +62,7 @@ forms:
 
 Forms a flag-only test, and:
 
-.. code-block:: text
+.. code-block:: shell
 
 	probe_feature <<'EOF' &
 	CC_HAS_SSIZE_T
@@ -86,7 +86,7 @@ Linker Feature Detection
 ``scripts/probe-ld-features.sh`` defines the features to test. The test is
 formed in:
 
-.. code-block:: text
+.. code-block:: shell
 
 	probe_feature <<'EOF' &
 	LD_HAS_COMPRESS_DEBUG_SECTIONS_ZLIB
@@ -106,7 +106,7 @@ build/probe/repo/version
 
 These constants are defined in the Makefile:
 
-.. code-block:: text
+.. code-block:: make
 
 	name := example
 	version := 8.3.1

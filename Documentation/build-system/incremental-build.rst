@@ -24,7 +24,7 @@ Configuration Dependencies
 ``CONFIG_*`` references. It converts each reference into a dependency under
 include/config/. For example, CONFIG_ENABLE_DEBUG produces:
 
-.. code-block:: text
+.. code-block:: make
 
 	$(wildcard include/config/enable/debug.h)
 
