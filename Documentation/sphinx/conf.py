@@ -19,7 +19,8 @@ html_static_path = [
 ]
 
 html_css_files = [
-	'custom.css',
+	'code_color.css',
+	'layout.css',
 ]
 
 extensions = [
