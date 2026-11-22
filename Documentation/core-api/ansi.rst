@@ -7,7 +7,7 @@ ansi.h
 ``ansi`` provides ANSI escape codes for terminal text formatting.
 
 Formatting Codes
-----------------
+================
 
 Formatting sequences begin with ``\033[`` and end with ``m``. Multiple codes
 are separated by semicolons.
@@ -36,6 +36,6 @@ Example::
 This produces bold red text followed by a formatting reset.
 
 API Reference
--------------
+=============
 
 .. kernel-doc:: /include/ansi.h

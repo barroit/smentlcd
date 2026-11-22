@@ -8,7 +8,7 @@ log_nb.h
 worker thread.
 
 Logging
--------
+=======
 
 Messages are queued in a ring buffer and processed asynchronously by a worker.
 
@@ -18,7 +18,7 @@ Automatic commit notifies the worker when messages are queued. It is enabled
 by default and can be controlled through ``log_nb_auto_commit()``.
 
 Initialization
---------------
+==============
 
 Call ``log_nb_init()`` to initialize the ring buffer, eventfd, and worker
 thread. Then call ``log_nb_activate()`` to route logging output through the
@@ -30,7 +30,7 @@ the worker thread.
 Worker failures disable the backend and restore the default logging handler.
 
 Signal Handling
----------------
+===============
 
 ``log_nb_catch_signal()`` blocks SIGTERM and starts a thread that waits for the
 signal. When received, the thread invokes the termination handler and exits the
@@ -43,13 +43,13 @@ messages, and joins the worker thread.
 restore the previous signal mask.
 
 Backend State
--------------
+=============
 
 .. c:var:: int log_nb_enabled
 
    Nonzero when the non-blocking logging backend is active.
 
 API Reference
--------------
+=============
 
 .. kernel-doc:: /include/log_nb.h

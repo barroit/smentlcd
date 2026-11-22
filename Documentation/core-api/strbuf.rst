@@ -8,7 +8,7 @@ strbuf.h
 capacity.
 
 Storage Modes
--------------
+=============
 
 ``SB_ALLOC`` enables automatic allocation and growth.
 
@@ -21,7 +21,7 @@ Capacity includes space for the terminating NUL character.
 the mode. Do not call them on buffers backed by stack or static storage.
 
 Buffer Modification
--------------------
+===================
 
 Write operations append to the buffer by default.
 
@@ -34,7 +34,7 @@ Write operations return the number of bytes written, or zero if a preallocated
 buffer lacks sufficient capacity.
 
 API Reference
--------------
+=============
 
 .. kernel-doc:: /include/strbuf.h
    :symbols: strbuf

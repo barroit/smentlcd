@@ -7,7 +7,7 @@ strlist.h
 ``strlist`` provides string lists with configurable storage and ownership.
 
 Storage Modes
--------------
+=============
 
 Each list uses one of three storage modes:
 
@@ -27,7 +27,7 @@ Other behavior flags may be combined with the selected storage mode, subject
 to additional constraints enforced by assertions in ``lib/strlist.c``.
 
 Ownership and Lifetime
-----------------------
+======================
 
 ``sl_pop()`` removes the first string from the list.
 
@@ -42,7 +42,7 @@ SL_POP_DUP makes ``sl_pop()`` return an independent copy in reference and buffer
 modes. The caller must free the copy.
 
 List Operations
----------------
+===============
 
 ``sl_push()`` inserts at the front of the list, while ``sl_push_back()`` inserts
 at the back. ``sl_pop()`` removes from the front.
@@ -51,7 +51,7 @@ With SL_RET_LEN, push operations return the string length. Otherwise, they
 return ``(size_t)-1``.
 
 Line Wrapping
--------------
+=============
 
 ``sl_read_line()`` splits text into lines based on a maximum display width.
 
@@ -61,7 +61,7 @@ columns, and breaks at whitespace or recognized punctuation where possible.
 SL_USE_REF mode is not supported for line wrapping.
 
 API Reference
--------------
+=============
 
 .. kernel-doc:: /include/strlist.h
    :symbols: strlist

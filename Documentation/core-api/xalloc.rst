@@ -11,7 +11,7 @@ The wrappers record the source file, line number, and function name for
 diagnostics.
 
 Failure Handling
-----------------
+================
 
 Allocation and mapping failures produce a diagnostic message and abort the
 process.
@@ -23,6 +23,6 @@ When ``CONFIG_WARN_LARGE_ALLOC`` is enabled, ``xmalloc()``, ``xcalloc()``,
 equal to ``CONFIG_LARGE_ALLOC_THRESHOLD`` without aborting.
 
 API Reference
--------------
+=============
 
 .. kernel-doc:: /include/xalloc.h

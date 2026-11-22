@@ -7,7 +7,7 @@ The smentlcd Documentation
 This is the top level of the smentlcd's documentation tree.
 
 User Manual
------------
+===========
 
 .. toctree::
    :maxdepth: 1
@@ -16,7 +16,7 @@ User Manual
    user-manual/input
 
 Shared Infrastructure
----------------------
+=====================
 
 These components are reused across repositories and continue to evolve. Some
 functionality may be unused; this is expected and should be retained.
@@ -29,7 +29,7 @@ functionality may be unused; this is expected and should be retained.
    test/index
 
 Repository Specific Component
------------------------------
+=============================
 
 .. toctree::
    :maxdepth: 1

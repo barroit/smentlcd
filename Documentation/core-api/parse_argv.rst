@@ -14,7 +14,7 @@ pick, and command mode targets before calling ``pa_parse_args()``. The parser
 updates target objects but does not automatically initialize them.
 
 Argument Syntax
----------------
+===============
 
 An option begins with ``--``::
 
@@ -38,7 +38,7 @@ A bare argument does not begin with ``-``::
 	origin/main
 
 Parsing Flow
-------------
+============
 
 The parser walks ``argv[1..]`` from left to right.
 
@@ -57,7 +57,7 @@ command-selection state.
 ``argv[0]``.
 
 Command Selection
------------------
+=================
 
 When command entries exist, the parser matches eligible bare arguments against
 command names.
@@ -93,7 +93,7 @@ For example, with ``add`` as a valid command and ``status`` as the default::
 		=> argv: status file add
 
 Entry Matching
---------------
+==============
 
 An entry may provide an option form, a flag form, or both. A ``NULL`` name
 disables the option form. A zero alias disables the flag form.
@@ -105,7 +105,7 @@ For options, the text before ``=`` is used for matching. The text after ``=`` is
 the value.
 
 Option Negation
----------------
+===============
 
 Unless ``PA_OPT_NO_NEG`` is set, options accept ``--no-name`` form.
 
@@ -119,7 +119,7 @@ depends on the entry type.
 options exist.
 
 Values
-------
+======
 
 Options accept values in either form::
 
@@ -150,7 +150,7 @@ Examples::
 		=> m's value is "-v"
 
 Unknown Arguments
------------------
+=================
 
 With ``PA_STOP_UNKNOWN``, parsing stops at an unknown option or flag.
 
@@ -163,14 +163,14 @@ For example, if ``-a`` is known and ``-b`` is unknown, ``-ab`` applies ``-a``
 and returns ``-b``.
 
 End of Options
---------------
+==============
 
 ``--`` stops option and flag parsing.
 
 All remaining arguments are returned in the output ``argv``.
 
 Help
-----
+====
 
 ``-h`` and ``--help`` print usage and exit.
 
@@ -178,6 +178,6 @@ Usage lines and entries are printed with command forms, flag forms, option
 forms, value hints, and help text. Long text is wrapped.
 
 API Reference
--------------
+=============
 
 .. kernel-doc:: /include/parse_argv.h

@@ -9,6 +9,6 @@ counting, macro invocation, token concatenation, Kconfig checks, and poison
 pointers.
 
 API Reference
--------------
+=============
 
 .. kernel-doc:: /include/cpp.h

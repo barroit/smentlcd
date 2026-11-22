@@ -5,7 +5,7 @@ Core API
 ========
 
 Compiler Support
-----------------
+================
 
 Compiler attributes, preprocessor utilities, and memory barriers.
 
@@ -18,7 +18,7 @@ Compiler attributes, preprocessor utilities, and memory barriers.
    cpp
 
 Data Structures and Text
-------------------------
+========================
 
 Data structures, string manipulation, text conversion, and Unicode support.
 
@@ -33,7 +33,7 @@ Data structures, string manipulation, text conversion, and Unicode support.
    unicode
 
 Input, Output, and Logging
---------------------------
+==========================
 
 Terminal formatting, input and output routines, and logging facilities.
 
@@ -46,7 +46,7 @@ Terminal formatting, input and output routines, and logging facilities.
    rio
 
 General Utilities
------------------
+=================
 
 Exit handlers, calculations, argument parsing, and memory allocation.
 

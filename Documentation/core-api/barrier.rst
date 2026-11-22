@@ -8,7 +8,7 @@ barrier.h
 the compiler's ``__atomic`` builtins.
 
 Memory Ordering
----------------
+===============
 
 Relaxed operations provide atomic access without imposing inter-thread ordering
 constraints.
@@ -25,6 +25,6 @@ ordering.
 For more details, see the Linux kernel's ``Documentation/memory-barriers.txt``.
 
 API Reference
--------------
+=============
 
 .. kernel-doc:: /include/barrier.h

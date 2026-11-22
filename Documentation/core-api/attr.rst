@@ -9,6 +9,6 @@ function properties, initialization, diagnostics, symbol handling, and
 instrumentation.
 
 API Reference
--------------
+=============
 
 .. kernel-doc:: /include/attr.h

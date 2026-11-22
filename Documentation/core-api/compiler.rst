@@ -8,6 +8,6 @@ compiler.h
 compile-time assertions, and container access macros.
 
 API Reference
--------------
+=============
 
 .. kernel-doc:: /include/compiler.h

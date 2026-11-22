@@ -7,7 +7,7 @@ log.h
 ``log`` provides formatted logging, diagnostics, and error reporting.
 
 Message Formatting
-------------------
+==================
 
 All logging functions use printf-style format strings.
 
@@ -18,7 +18,7 @@ Messages have the following format::
 ``prefix`` and ``hint`` are optional. Each message ends with a newline.
 
 Output Backend
---------------
+==============
 
 .. c:var:: log_vwritef_fn log_vwritef
 
@@ -27,6 +27,6 @@ Output Backend
    Defaults to __log_vwritef(). Assign another handler to customize output.
 
 API Reference
--------------
+=============
 
 .. kernel-doc:: /include/log.h

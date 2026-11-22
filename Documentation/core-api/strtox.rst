@@ -7,7 +7,7 @@ strtox.h
 ``strtox`` converts strings to integers with strict input and range validation.
 
 Conversion Rules
-----------------
+================
 
 The input must contain a valid integer. Leading or trailing whitespace, invalid
 digits, and trailing characters are rejected.
@@ -27,7 +27,7 @@ target type. The result wraps according to unsigned arithmetic. For example,
 ``-1`` becomes the maximum value of the target type.
 
 Error Handling
---------------
+==============
 
 All functions return zero on success or -1 on failure.
 
@@ -42,6 +42,6 @@ On failure, ``errno`` is set to:
 The result is left unchanged on failure.
 
 API Reference
--------------
+=============
 
 .. kernel-doc:: /include/strtox.h
