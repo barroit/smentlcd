@@ -1,4 +1,53 @@
-sment-lcd
----------
+smentlcd
+========
 
 A small daemon that controls SpaceMouse Enterprise LCD.
+
+Motivation
+==========
+
+The vendor Linux driver for the SpaceMouse Enterprise is effectively
+abandonware. On Linux, Blender relies on libspnav instead, which is backed by
+the open-source spacenavd daemon.
+
+spacenavd handles input well enough, but it completely ignores the LCD. Without
+control over the display, the screen is just dead weight stuck showing the
+default vendor logo.
+
+Reading spacenavd's source shows that it never claims the LCD USB interface.
+That leaves the door open: smentlcd uses libusb to claim only the LCD interface
+and drive it directly, allowing arbitrary static images and GIFs to be rendered
+on the display. It doesn't touch input handling and coexists cleanly alongside
+spacenavd.
+
+Platform Support
+================
+
+Developed and tested on Ubuntu 26.04 for personal use. Linux is the only
+supported target. Porting to FreeBSD should be trivial given libusb, though it's
+currently untested.
+
+macOS support was originally planned -- which is why parts of the codebase (such
+as the IPC layer) are more abstracted than a Linux-only daemon strictly needs.
+That effort was dropped. On macOS, Blender relies on the official vendor driver,
+and once that driver is running, the OS refuses to let libusb claim the required
+USB interface. Under the current architecture, coexistence is simply unsolvable.
+I have zero interest in fighting Apple's USB stack or rewriting the design
+around it, and no other platforms are planned.
+
+Documentation
+=============
+
+Full documentation lives in the Documentation directory (reStructuredText) and
+is rendered online at:
+
+	https://docs.barroit.sh/smentlcd
+
+Entry points:
+
+	Documentation/user-manual/	installation and usage
+	Documentation/build-system/	build system
+	Documentation/program/		program and command architecture
+	Documentation/core-api/		core utility APIs
+	Documentation/smentlcd-api/	smentlcd-specific APIs
+	Documentation/test/		test suite
