@@ -9,11 +9,12 @@
 #include <poll.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include <systemd/sd-event.h>
 
+#include "calc.h"
 #include "list.h"
 #include "log.h"
-#include "xalloc.h"
 #include "size.h"
 
 struct once_queue {
@@ -37,6 +38,8 @@ struct event_ctx {
 int dev_wake_libusb(void);
 
 static struct event_ctx ctx;
+
+const size_t event_src_size = sizeof(struct sd_event_source *);
 
 void event_init(void)
 {
@@ -176,11 +179,10 @@ static int handle_event_io(sd_event_source *src, int fd, uint32_t revents,
 	return dev_wake_libusb();
 }
 
-void *event_watch_pollfd(size_t nalloc, int fd, short events)
+int event_watch_pollfd(void *__src, int fd, short events)
 {
 	int err;
-	char *buf;
-	struct sd_event_source **src;
+	struct sd_event_source *src;
 	uint32_t sd_events = 0;
 
 	if (events & POLLIN)
@@ -189,20 +191,17 @@ void *event_watch_pollfd(size_t nalloc, int fd, short events)
 	if (events & POLLOUT)
 		sd_events |= EPOLLOUT;
 
-	buf = xmalloc(nalloc + sizeof(*src));
-	src = (typeof(src))&buf[nalloc];
-
-	err = sd_event_add_io(ctx.event, src, fd, sd_events, handle_event_io,
+	err = sd_event_add_io(ctx.event, &src, fd, sd_events, handle_event_io,
 			      NULL);
 	if (err) {
 		error_errno2(-err,
-			     "unable to add libusb pollfd %d as new I/O event source to event loop",
+			     "unable to add libusb pollfd %d as I/O event source",
 			     fd);
-		free(buf);
-		return NULL;
+		return 1;
 	}
 
-	return buf;
+	memcpy(__src, &src, event_src_size);
+	return 0;
 }
 
 void event_unwatch_pollfd(void *src)

@@ -6,18 +6,7 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-#include <stdalign.h>
-#include <stddef.h>
 #include <stdint.h>
-
-#include "list.h"
-
-struct event_source {
-	int fd;
-	struct list_head list;
-
-	alignas(max_align_t) char data[];
-};
 
 void dev_init(void);
 

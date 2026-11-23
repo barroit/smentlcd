@@ -6,7 +6,7 @@
 #include "device.h"
 
 #include <inttypes.h>
-#include <stdint.h>
+#include <stdalign.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,9 +15,11 @@
 #include "calc.h"
 #include "event.h"
 #include "libusb.h"
+#include "list.h"
 #include "log.h"
 #include "playback.h"
 #include "size.h"
+#include "xalloc.h"
 
 #define libusb_hotplug_register libusb_hotplug_register_callback
 
@@ -38,6 +40,13 @@ struct dev_ctx {
 	struct libusb_device_descriptor dd;
 
 	struct transfer_buffer tb;
+};
+
+struct pollfd_event {
+	int fd;
+	struct list_head list;
+
+	alignas(max_align_t) char src[];
 };
 
 int dev_wake_libusb(void);
@@ -80,12 +89,14 @@ void dev_init(void)
 
 static void watch_pollfd(int fd, short events, void *userdata)
 {
-	struct event_source *event;
-	size_t nalloc = cc_offsetof(struct event_source, data);
+	int err;
+	struct pollfd_event *event = xmalloc(sizeof(*event) + event_src_size);
 
-	event = event_watch_pollfd(nalloc, fd, events);
-	if (!event)
+	err = event_watch_pollfd(event->src, fd, events);
+	if (err) {
+		free(event);
 		return;
+	}
 
 	event->fd = fd;
 	list_add_tail(&event->list, &ctx.events);
@@ -93,11 +104,11 @@ static void watch_pollfd(int fd, short events, void *userdata)
 
 static void unwatch_pollfd(int fd, void *userdata)
 {
-	struct event_source *event;
+	struct pollfd_event *event;
 
 	list_foreach_entry(event, &ctx.events, list) {
 		if (event->fd == fd) {
-			event_unwatch_pollfd(event->data);
+			event_unwatch_pollfd(event->src);
 			list_del(&event->list);
 
 			free(event);

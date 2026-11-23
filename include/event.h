@@ -13,6 +13,8 @@ typedef void (*event_once_fn)(void);
 
 typedef int (*event_timeout_fn)(void);
 
+extern const size_t event_src_size;
+
 void event_init(void);
 
 void *event_current(void);
@@ -27,7 +29,7 @@ int event_resched_timeout(void *timer, uint64_t msec);
 
 void event_destroy_timeout(void *timer);
 
-void *event_watch_pollfd(size_t nalloc, int fd, short events);
+int event_watch_pollfd(void *src, int fd, short events);
 
 void event_unwatch_pollfd(void *src);
 
