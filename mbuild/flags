@@ -79,6 +79,14 @@ ifeq ($(SERVICE),systemd)
   DAEMON_LDFLAGS += -ludev
 endif
 
+ifneq ($(CONFIG_EMBED_CONFIG),)
+  ifneq ($(CC_EMITS_ELF),)
+    LDFLAGS += -Wl,-b,binary,build/.config,-b,default,-T,scripts/kconfig.ld
+  else ifneq ($(CC_EMITS_MACH),)
+    LDFLAGS += -Wl,-sectcreate,__TEXT,kconfig,build/.config
+  endif
+endif
+
 build/.flags.cc: .force
 	@trap 'rm -f .tmp-$$$$' EXIT && \
 	printf '%s\n' "$(CFLAGS)" >.tmp-$$$$ && \

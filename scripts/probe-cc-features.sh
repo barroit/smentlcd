@@ -94,4 +94,20 @@ extern int *var;
 __attribute__((no_sanitize("address"))) int *var = (typeof(var))39;
 EOF
 
+probe_feature <<'EOF' &
+CC_EMITS_ELF
+
+#ifndef __ELF__
+# error not ELF
+#endif
+EOF
+
+probe_feature <<'EOF' &
+CC_EMITS_MACH
+
+#ifndef __MACH__
+# error not MACH
+#endif
+EOF
+
 wait

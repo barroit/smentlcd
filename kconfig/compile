@@ -97,4 +97,8 @@ config VALIDATE_LIST_MUTATION
 	bool "Validate list modifications"
 	default ENABLE_DEBUG
 
+config EMBED_CONFIG
+	bool "Embed Kconfig dump in executable"
+	default y
+
 endmenu # Compile options
