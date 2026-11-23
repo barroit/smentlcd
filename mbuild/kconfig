@@ -13,7 +13,8 @@ alldefconfig: bootstrap
 
 menuconfig: bootstrap
 	MENUCONFIG_STYLE=aquatic $(kconfiglib)/menuconfig.py
-	mkdir -p include/generated
+	test -f build/.config || exit 0; \
+	mkdir -p include/generated; \
 	$(kconfiglib)/genconfig.py --header-path include/generated/config.h \
 				   --sync-deps include/config
 
