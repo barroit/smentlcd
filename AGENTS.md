@@ -1,5 +1,13 @@
-This repository targets Linux.
-Put platform-specific code under `./systemd`.
-Do not call die*() functions in daemon code unless I ask.
-Do not try to compile if the current host is macOS.
-Do not check if device is enabled when patching lib/device.c.
+# Code
+
+- Target Linux only.
+- Put platform-specific code under `systemd/`.
+- Don't call `die*()` functions in daemon code.
+- Don't add device-enabled checks when modifying `lib/device.c`.
+
+# Commit
+
+- Follow the commit subject style used in this repository's history.
+- Identify the primary purpose of the changes before committing.
+- Don't use "and" in the commit subject.
+- Write a commit subject only. Don't include a body.
