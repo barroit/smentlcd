@@ -86,17 +86,6 @@ ssize_t a = 0;
 EOF
 
 probe_feature <<'EOF' &
-__unix__
-
-/*
- * Only macOS lacks this.
- */
-#ifndef __APPLE__
-# error not on macos
-#endif
-EOF
-
-probe_feature <<'EOF' &
 CC_HAS_VARIABLE_NO_SANITIZE
 -fsanitize=address,undefined
 
