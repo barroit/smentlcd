@@ -5,13 +5,13 @@ kconfiglib := KCONFIG_FUNCTIONS=kconfig PYTHONPATH=$(CURDIR)/scripts \
 
 .PHONY: alldefconfig menuconfig
 
-alldefconfig: bootstrap
+alldefconfig: build/.bootstrap
 	$(kconfiglib)/alldefconfig.py
 	mkdir -p include/generated
 	$(kconfiglib)/genconfig.py --header-path include/generated/config.h \
 				   --sync-deps include/config
 
-menuconfig: bootstrap
+menuconfig: build/.bootstrap
 	MENUCONFIG_STYLE=aquatic $(kconfiglib)/menuconfig.py
 	test -f build/.config || exit 0; \
 	mkdir -p include/generated; \
