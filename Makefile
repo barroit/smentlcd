@@ -29,6 +29,9 @@ include mbuild/probe
 include mbuild/kconfig
 
 ifneq ($(on_build),)
+  # Make sure bootstrap is done.
+  include build/.bootstrap
+
   include build/probe/cc/features
   include build/probe/ld/features
 
@@ -37,13 +40,13 @@ ifneq ($(on_build),)
   include build/daemon/cmdtree
   include build/ctl/cmdtree
 
-  CC != cat build/probe/cc/program
-  LD != cat build/probe/ld/id
+  CC := $(file <build/probe/cc/id)
+  LD := $(file <build/probe/ld/id)
 
-  USE_GCC != test $$(cat build/probe/cc/id) = gcc && printf y
-  USE_CLANG != test $$(cat build/probe/cc/id) = clang && printf y
+  USE_GCC := $(if $(filter gcc,$(CC)),y)
+  USE_CLANG := $(if $(filter clang,$(CC)),y)
 
-  SERVICE != test $$(cat build/probe/host/id) = linux && printf systemd
+  SERVICE := $(if $(filter linux,$(file <build/probe/host/id)),systemd)
 endif
 
 include mbuild/flags

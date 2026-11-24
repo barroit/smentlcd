@@ -18,6 +18,10 @@ bootstrap: build/probe/cc/program \
 	   build/probe/host/arch \
 	   build/probe/host/name \
 	   build/probe/utf8/locale
+	touch build/.bootstrap
+
+build/.bootstrap:
+	$(error Missing bootstrap dependencies. Run 'make bootstrap' first)
 
 include/generated/build.h: build/probe/repo/name build/probe/repo/version \
 		     build/probe/host/id build/probe/host/arch \
