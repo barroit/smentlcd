@@ -32,6 +32,7 @@
       "${workspaceFolder}/include/generated/build.h",
       "${workspaceFolder}/include/generated/config.h",
       "${workspaceFolder}/include/generated/features.h",
+      "${workspaceFolder}/include/generated/repo.h",
       "${workspaceFolder}/include/generated/unitest.h",
    ],
    "C_Cpp.default.defines": [

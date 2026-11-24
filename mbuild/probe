@@ -23,16 +23,29 @@ bootstrap: build/probe/cc/program \
 build/.bootstrap:
 	$(error Missing bootstrap dependencies. Run 'make bootstrap' first)
 
-include/generated/build.h: build/probe/repo/name build/probe/repo/version \
-			   build/probe/host/id build/probe/host/arch \
+include/generated/build.h: build/probe/cc/id \
+			   build/probe/cc/version \
+			   build/probe/ld/id \
+			   build/probe/ld/version \
+			   build/probe/host/id \
+			   build/probe/host/arch \
 			   build/probe/host/name
 	mkdir -p $(@D)
-	printf '%s\n' $^ | ./scripts/gen-build_h.sh -e s,[^/]\\+/repo,repo, >$@
+	printf '%s\n' $^ | \
+	./scripts/gen-headers.sh BUILD -e s,^build/probe/,build/, >$@
 
 include/generated/features.h: build/probe/cc/features \
 			      build/probe/ld/features
 	mkdir -p $(@D)
 	cat $^ | ./scripts/gen-features_h.sh >$@
+
+include/generated/repo.h: build/probe/repo/name \
+			  build/probe/repo/version \
+			  build/probe/repo/hash \
+			  build/probe/repo/dirty
+	mkdir -p $(@D)
+	printf '%s\n' $^ | \
+	./scripts/gen-headers.sh REPO -e s,^build/probe/,, >$@
 
 build/probe/repo/name:
 	mkdir -p $(@D)
@@ -42,17 +55,27 @@ build/probe/repo/version:
 	mkdir -p $(@D)
 	printf '%s\n' $(version) >$@
 
-build/probe/host/id:
-	mkdir -p $(@D)
-	python3 -c 'import sys; print(sys.platform)' >$@
+build/probe/repo/hash: .force
+	@mkdir -p $(@D)
+	@$(call mv_stale_c,git rev-parse HEAD,$@)
 
-build/probe/host/arch:
-	mkdir -p $(@D)
-	python3 -c 'import platform; print(platform.machine())' >$@
+build/probe/repo/dirty: .force
+	@mkdir -p $(@D)
+	@$(call mv_stale_c,git diff HEAD --quiet || \
+			   git diff HEAD | git hash-object --stdin,$@)
 
-build/probe/host/name:
+build/probe/host/id: build/probe/host/.dump
+	cut -f1 $< >$@
+
+build/probe/host/arch: build/probe/host/.dump
+	cut -f2 $< >$@
+
+build/probe/host/name: build/probe/host/.dump
+	cut -f3- $< >$@
+
+build/probe/host/.dump:
 	mkdir -p $(@D)
-	python3 -c 'import platform; print(platform.system())' >$@
+	./scripts/probe-host.py >$@
 
 build/probe/cc/program: build/probe/cc/.dump
 	cut -f1 $< >$@

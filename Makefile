@@ -122,7 +122,9 @@ build/$(name)ctl: build/ctl/main/entry
 $(lib-obj-y):
 
 build/%.o: %.c \
-	   include/generated/build.h include/generated/features.h \
+	   include/generated/build.h \
+	   include/generated/features.h \
+	   include/generated/repo.h \
 	   build/.flags.cc
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) $(addprefix -include ,$(filter include/generated/% \

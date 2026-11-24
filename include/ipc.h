@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define IPC_INTERFACE_NAME "sh.barroit." BUILD_REPO_NAME
+#define IPC_INTERFACE_NAME "sh.barroit." REPO_NAME
 
 #define IPC_DEV_STAT_VENDOR_ID		(1u << 0)
 #define IPC_DEV_STAT_MANUFACTURER	(1u << 1)
