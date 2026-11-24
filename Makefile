@@ -92,8 +92,7 @@ ifeq ($(CC_HAS_STRCHRNUL),)
   lib-obj-y += build/lib/patch/strchrnul.o
 endif
 
-include mbuild/daemon
-include mbuild/ctl
+include mbuild/executable
 include mbuild/command
 
 ifneq ($(or $(print_db),$(CONFIG_ENABLE_TEST)),)

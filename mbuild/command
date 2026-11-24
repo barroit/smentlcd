@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+.NOTINTERMEDIATE: build/%/cmdtree build/%/.commands
+
 include/%/cmdtab.h:
 	mkdir -p $(@D)
 	printf '%s\n' $| | sort | ./scripts/cmd-tab.sh $@ >$@
