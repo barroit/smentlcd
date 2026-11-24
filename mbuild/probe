@@ -24,13 +24,13 @@ build/.bootstrap:
 	$(error Missing bootstrap dependencies. Run 'make bootstrap' first)
 
 include/generated/build.h: build/probe/repo/name build/probe/repo/version \
-		     build/probe/host/id build/probe/host/arch \
-		     build/probe/host/name
+			   build/probe/host/id build/probe/host/arch \
+			   build/probe/host/name
 	mkdir -p $(@D)
 	printf '%s\n' $^ | ./scripts/gen-build_h.sh -e s,[^/]\\+/repo,repo, >$@
 
 include/generated/features.h: build/probe/cc/features \
-			build/probe/ld/features
+			      build/probe/ld/features
 	mkdir -p $(@D)
 	cat $^ | ./scripts/gen-features_h.sh >$@
 
@@ -97,9 +97,7 @@ build/probe/tools:
 	mv .tmp-$$$$ $@
 
 build/probe/%/features: build/probe/%/program
-	trap 'rm -f .tmp-$$$$' EXIT && \
-	./scripts/probe-$*-features.sh $$(cat $^) | \
-	sort >.tmp-$$$$ && $(call mv_stale,.tmp-$$$$,$(@),$?)
+	@$(call mv_stale_c,./scripts/probe-$*-features.sh $(file <$^),$@,$?)
 
 build/probe/utf8/locale:
 	mkdir -p $(@D)

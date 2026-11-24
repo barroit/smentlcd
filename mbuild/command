@@ -11,9 +11,7 @@ build/%/cmdtree: build/%/.commands scripts/cmd-tree.py
 
 build/%/.commands: .force
 	@mkdir -p $(@D)
-	@trap 'rm -f .tmp-$$$$' EXIT && \
-	find $* -type f -not -name '*_entry.c' | sort >.tmp-$$$$ && \
-	$(call mv_stale,.tmp-$$$$,$(@),)
+	@$(call mv_stale_c,find $* -type f -not -name '*_entry.c' | sort,$@)
 
 %_entry.c: | %.c
 	./scripts/cmd-entry.sh $* >$@

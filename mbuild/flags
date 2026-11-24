@@ -6,9 +6,9 @@ LDFLAGS :=
 CFLAGS += -std=gnu17
 
 ifneq ($(USE_CLANG),)
-  LDFLAGS += --ld-path=$$(cat build/probe/ld/program)
+  LDFLAGS += --ld-path=$(file <build/probe/ld/program)
 else ifneq ($(USE_GCC),)
-  LDFLAGS += -B$(shell dirname $$(cat build/probe/ld/program))
+  LDFLAGS += -B$(shell dirname $(file <build/probe/ld/program))
 endif
 
 LDFLAGS += -fuse-ld=$(LD)
@@ -88,16 +88,10 @@ ifneq ($(CONFIG_EMBED_CONFIG),)
 endif
 
 build/.flags.cc: .force
-	@trap 'rm -f .tmp-$$$$' EXIT && \
-	printf '%s\n' "$(CFLAGS)" >.tmp-$$$$ && \
-	$(call mv_stale,.tmp-$$$$,$(@),)
+	@$(call mv_stale_c,printf '%s\n' '$(CFLAGS)',$@)
 
 build/.flags.ld: .force
-	@trap 'rm -f .tmp-$$$$' EXIT && \
-	printf '%s\n' "$(LDFLAGS)" >.tmp-$$$$ && \
-	$(call mv_stale,.tmp-$$$$,$(@),)
+	@$(call mv_stale_c,printf '%s\n' '$(LDFLAGS)',$@)
 
 build/.flags.ld-daemon: .force
-	@trap 'rm -f .tmp-$$$$' EXIT && \
-	printf '%s\n' "$(DAEMON_LDFLAGS)" >.tmp-$$$$ && \
-	$(call mv_stale,.tmp-$$$$,$(@),)
+	@$(call mv_stale_c,printf '%s\n' '$(DAEMON_LDFLAGS)',$@)

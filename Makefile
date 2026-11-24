@@ -20,9 +20,18 @@ print_db := $(findstring p,$(firstword $(MAKEFLAGS)))
 no_print_db := $(if $(print_db),,1)
 on_build := $(and $(no_print_db),$(filter $(build_targets),$(current_targets)))
 
-define mv_stale
-	test -f $(2) && cmp -s $(1) $(2) && test -z "$(3)" || \
-	{ mv $(1) $(2) && touch $(2); }
+define mv_stale_f
+	test -f $(2) && cmp -s $(1) $(2) && test -z "$(3)" || { \
+		mv $(1) $(2) && \
+		touch $(2) && \
+		$(if $(4),printf '%s >$(2)\n' '$(subst ','"'"',$(4))',:); \
+	}
+endef
+
+define mv_stale_c
+	trap 'rm -f .tmp-$$$$' EXIT; \
+	($(1)) >.tmp-$$$$; \
+	$(call mv_stale_f,.tmp-$$$$,$(2),$(3),$(1))
 endef
 
 include mbuild/probe
