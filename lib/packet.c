@@ -114,7 +114,7 @@ void packet_populate_header(struct packet *packet)
 		/*
 		 * Required protocol tag.
 		 */
-		header[0x001] = 0x0f; 
+		header[0x001] = 0x0f;
 
 		/*
 		 * Raw DEFLATE payload size, little-endian.

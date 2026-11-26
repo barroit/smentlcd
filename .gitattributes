@@ -1,3 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-*.rst linguist-detectable -linguist-documentation
+*.rst	linguist-detectable -linguist-documentation
+
+*.rst	conflict-marker-size=39
+README	conflict-marker-size=39
+patch/*	-whitespace

@@ -85,4 +85,3 @@ API Reference
 	     sl_pop,
 	     sl_read_line,
 	     sl_to_argv,
-
