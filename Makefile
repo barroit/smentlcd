@@ -62,43 +62,43 @@ include mbuild/flags
 include mbuild/install
 include mbuild/develop
 
-lib-obj-y += build/lib/atexit.o \
-	     build/lib/list.o \
-	     build/lib/log.o \
-	     build/lib/parse_argv.o \
-	     build/lib/rio.o \
-	     build/lib/sanitizer.o \
-	     build/lib/strbuf.o \
-	     build/lib/strlist.o \
-	     build/lib/strtox.o \
-	     build/lib/strutil.o \
-	     build/lib/unicode.o \
-	     build/lib/unicode_width.o \
-	     build/lib/xalloc.o
+obj-lib += build/lib/atexit.o \
+	   build/lib/list.o \
+	   build/lib/log.o \
+	   build/lib/parse_argv.o \
+	   build/lib/rio.o \
+	   build/lib/sanitizer.o \
+	   build/lib/strbuf.o \
+	   build/lib/strlist.o \
+	   build/lib/strtox.o \
+	   build/lib/strutil.o \
+	   build/lib/unicode.o \
+	   build/lib/unicode_width.o \
+	   build/lib/xalloc.o
 
-ctl-obj-y += build/lib/image.o \
-	     build/lib/packet.o
+obj-lib_ctl += build/lib/image.o \
+	       build/lib/packet.o
 
-daemon-obj-y += build/lib/device.o \
-		build/lib/log_nb.o \
-		build/lib/playback.o
+obj-lib_daemon += build/lib/device.o \
+		  build/lib/log_nb.o \
+		  build/lib/playback.o
 
 ifeq ($(SERVICE),systemd)
-  ctl-obj-y += build/lib/stbi.o \
-	       build/systemd/ipc_ctl.o
+  obj-lib_ctl += build/lib/stbi.o \
+		 build/systemd/ipc_ctl.o
 
-  daemon-obj-y += build/systemd/event.o \
-		  build/systemd/ipc_daemon.o \
-		  build/systemd/log_nb.o \
-		  build/systemd/pcheck.o
+  obj-lib_daemon += build/systemd/event.o \
+		    build/systemd/ipc_daemon.o \
+		    build/systemd/log_nb.o \
+		    build/systemd/pcheck.o
 endif
 
 ifeq ($(CC_HAS_REALLOCARRAY),)
-  lib-obj-y += build/lib/patch/reallocarray.o
+  obj-lib += build/lib/patch/reallocarray.o
 endif
 
 ifeq ($(CC_HAS_STRCHRNUL),)
-  lib-obj-y += build/lib/patch/strchrnul.o
+  obj-lib += build/lib/patch/strchrnul.o
 endif
 
 include mbuild/executable
@@ -109,10 +109,10 @@ ifneq ($(or $(print_db),$(CONFIG_ENABLE_TEST)),)
   include mbuild/cmdtest
 endif
 
--include $(lib-obj-y:.o=.d1)
--include $(ctl-obj-y:.o=.d1)
--include $(daemon-obj-y:.o=.d1)
--include $(cmd-obj-y:.o=.d1)
+-include $(obj-lib:.o=.d1)
+-include $(obj-lib_ctl:.o=.d1)
+-include $(obj-lib_daemon:.o=.d1)
+-include $(obj-cmd:.o=.d1)
 
 build/$(name)d: build/daemon/main/entry
 	cp $< $@
@@ -120,7 +120,7 @@ build/$(name)d: build/daemon/main/entry
 build/$(name)ctl: build/ctl/main/entry
 	cp $< $@
 
-$(lib-obj-y):
+$(obj-lib):
 
 build/%.o: %.c \
 	   include/generated/build.h \

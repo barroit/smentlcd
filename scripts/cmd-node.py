@@ -56,7 +56,7 @@ print('\n')
 
 iter = map(lambda file: f"build/{file[0:-1]}o", leaf)
 str = ' '.join(iter)
-print(f"cmd-obj-y += build/{node}.o {str}\n")
+print(f"obj-cmd += build/{node}.o {str}\n")
 
 print(f"build/{node}/.cmdnode: build/{node}/.cmdlist {script}\n")
 

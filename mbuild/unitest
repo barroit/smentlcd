@@ -28,7 +28,7 @@ build/t/unit/run: $(ut-y)
 
 $(ut-y):
 
-build/t/unit/%.bin: build/t/unit/%.o $(ut-lib-y) $(lib-obj-y) $(link-y)
+build/t/unit/%.bin: build/t/unit/%.o $(ut-lib-y) $(obj-lib) $(link-y)
 	mkdir -p $(@D)
 	$(CC) $(LDFLAGS) $^ -o $@
 
