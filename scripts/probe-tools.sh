@@ -7,7 +7,7 @@ trap 'rm -f .tmp-$$*' EXIT
 
 scripts=$(dirname $0)
 
-test -n "$cc" && test -n "$ld" && cat <<EOF >>.tmp-$$.in
+test -n "$CC" && test -n "$LD" && cat <<EOF >>.tmp-$$.in
 $CC	$LD
 EOF
 
