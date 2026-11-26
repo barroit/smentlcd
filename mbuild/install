@@ -44,7 +44,7 @@ uninstall_systemd:
 
 .PHONY: install_program
 
-install_program: build/$(name)d build/$(name)ctl
+install_program: build/ctl/main/entry build/daemon/main/entry
 	mkdir -p $(HOME)/.local/bin
-	rm -f $(HOME)/.local/bin/$(name)d $(HOME)/.local/bin/$(name)ctl
-	install -m $$(umask -S) $^ $(HOME)/.local/bin
+	install -m $$(umask -S) $(word 1,$^) $(HOME)/.local/bin/$(name)ctl
+	install -m $$(umask -S) $(word 2,$^) $(HOME)/.local/bin/$(name)d
