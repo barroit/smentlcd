@@ -46,8 +46,8 @@ ifneq ($(on_build),)
 
   include include/config/auto.conf
 
-  include build/daemon/cmdtree
-  include build/ctl/cmdtree
+  include build/ctl/.cmdtree
+  include build/daemon/.cmdtree
 
   CC := $(file <build/probe/cc/id)
   LD := $(file <build/probe/ld/id)
@@ -112,6 +112,7 @@ endif
 -include $(lib-obj-y:.o=.d1)
 -include $(ctl-obj-y:.o=.d1)
 -include $(daemon-obj-y:.o=.d1)
+-include $(cmd-obj-y:.o=.d1)
 
 build/$(name)d: build/daemon/main/entry
 	cp $< $@
@@ -127,9 +128,8 @@ build/%.o: %.c \
 	   include/generated/repo.h \
 	   build/.flags.cc
 	mkdir -p $(@D)
-	$(CC) $(CFLAGS) $(addprefix -include ,$(filter include/generated/% \
-						       include/ctl/% \
-						       include/daemon/%,$^)) \
+	$(CC) $(CFLAGS) $(addprefix -include ,$(filter include/generated/%, \
+						       $^)) \
 	      -c $< -o $@
 
 build/%.d1: build/%.d %.c
@@ -145,15 +145,17 @@ lib/unicode_width.c:
 .PHONY: clean distclean
 
 distclean:
-	rm -rf build include/daemon include/ctl include/config include/generated
+	rm -rf build include/config include/generated
 
 clean:
 	{ \
 		find build/lib build/daemon build/ctl \
-		     \( -name '*.o' -o -name '*.d' -o -name 'entry' \) \
+		     \( -name '*.o' -o -name '*.d' -o -name '*.d1' \
+			-o -name entry -o -name .cmdtree \
+			-o -name .cmdnode -o -name .cmdlist \) \
 		     -exec rm {} + ; \
-		find include/daemon include/ctl -type f -exec rm {} + ; \
+		find include/generated/daemon include/generated/ctl \
+		     -type f -exec rm {} + ; \
 		find daemon ctl -name '*_entry.c' -exec rm {} + ; \
 	} 2>/dev/null
-	rm -f build/daemon/.commands build/daemon/cmdtree \
-	      build/ctl/.commands build/ctl/cmdtree build/$(name)
+	rm -f build/$(name)

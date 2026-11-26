@@ -18,9 +18,9 @@ static const char *usage[] = {
 	NULL,
 };
 
-const char *help_main_play = "play the image";
+const char *help_play = "play the image";
 
-int cmd_main_play(int argc, const char **argv)
+int cmd_play(int argc, const char **argv)
 {
 	struct image image = {
 		.type = IMAGE_UNKNOWN,

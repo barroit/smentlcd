@@ -1,17 +1,22 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-.NOTINTERMEDIATE: build/%/cmdtree build/%/.commands
+.NOTINTERMEDIATE: build/%/.cmdtree build/%/.cmdnode build/%/.cmdlist
 
-include/%/cmdtab.h:
-	mkdir -p $(@D)
-	printf '%s\n' $| | sort | ./scripts/cmd-tab.sh $@ >$@
-
-build/%/cmdtree: build/%/.commands scripts/cmd-tree.py
-	./scripts/cmd-tree.py $*/main.c >$@
-
-build/%/.commands: .force
+include/generated/%/cmdtab.h: build/%/.cmdlist scripts/cmd-tab.sh
 	@mkdir -p $(@D)
-	@$(call mv_stale_c,find $* -type f -not -name '*_entry.c' | sort,$@)
+	grep '\.c' $< | ./scripts/cmd-tab.sh $* >$@
+
+build/%/.cmdtree: .force scripts/cmd-tree.py
+	@mkdir -p $(@D)
+	@$(call mv_stale_c,./scripts/cmd-tree.py $*,$@)
+
+build/%/.cmdnode: build/%/.cmdlist scripts/cmd-node.py
+	./scripts/cmd-node.py $* >$@
+
+build/%/.cmdlist: .force
+	@mkdir -p $(@D)
+	@$(call mv_stale_c,find $* -maxdepth 1 | \
+			   grep -v '_entry\.c$$' | sort,$@)
 
 %_entry.c: | %.c
 	./scripts/cmd-entry.sh $* >$@
