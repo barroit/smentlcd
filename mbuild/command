@@ -6,6 +6,10 @@ include/generated/%/cmdtab.h: build/%/.cmdlist scripts/cmd-tab.sh
 	@mkdir -p $(@D)
 	grep '\.c' $< | ./scripts/cmd-tab.sh $* >$@
 
+include/generated/%/cmddecl.h: scripts/cmd-decl.sh
+	@mkdir -p $(@D)
+	./scripts/cmd-decl.sh $* >$@
+
 build/%/.cmdtree: .force scripts/cmd-tree.py
 	@mkdir -p $(@D)
 	@$(call mv_stale_c,./scripts/cmd-tree.py $*,$@)

@@ -60,6 +60,12 @@ print(f"obj-cmd += build/{node}.o {str}\n")
 
 print(f"build/{node}/.cmdnode: build/{node}/.cmdlist {script}\n")
 
+for file in leaf:
+	name = file[0:-2]
+
+	print(f"build/{name}.o: include/generated/{name}/cmddecl.h")
+print()
+
 print(f"build/{node}.o: include/generated/{node}/cmdtab.h\n")
 
 print(f"build/{node}/entry: build/{node}_entry.o $(cmd-obj-{node_name}) |",
