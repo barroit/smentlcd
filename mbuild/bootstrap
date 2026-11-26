@@ -27,6 +27,8 @@ include/generated/build.h: build/probe/cc/id \
 			   build/probe/cc/version \
 			   build/probe/ld/id \
 			   build/probe/ld/version \
+			   build/probe/repo/name \
+			   build/probe/repo/version \
 			   build/probe/host/id \
 			   build/probe/host/arch \
 			   build/probe/host/name
@@ -39,14 +41,6 @@ include/generated/features.h: build/probe/cc/features \
 	mkdir -p $(@D)
 	cat $^ | ./scripts/gen-features_h.sh >$@
 
-include/generated/repo.h: build/probe/repo/name \
-			  build/probe/repo/version \
-			  build/probe/repo/hash \
-			  build/probe/repo/dirty
-	mkdir -p $(@D)
-	printf '%s\n' $^ | \
-	./scripts/gen-headers.sh REPO -e s,^build/probe/,, >$@
-
 build/probe/repo/name:
 	mkdir -p $(@D)
 	printf '%s\n' $(name) >$@
@@ -54,15 +48,6 @@ build/probe/repo/name:
 build/probe/repo/version:
 	mkdir -p $(@D)
 	printf '%s\n' $(version) >$@
-
-build/probe/repo/hash: .force
-	@mkdir -p $(@D)
-	@$(call mv_stale_c,git rev-parse HEAD,$@)
-
-build/probe/repo/dirty: .force
-	@mkdir -p $(@D)
-	@$(call mv_stale_c,git diff HEAD --quiet || \
-			   git diff HEAD | git hash-object --stdin,$@)
 
 build/probe/host/id: build/probe/host/.dump
 	cut -f1 $< >$@

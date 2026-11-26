@@ -125,7 +125,6 @@ $(obj-lib):
 build/%.o: %.c \
 	   include/generated/build.h \
 	   include/generated/features.h \
-	   include/generated/repo.h \
 	   build/.flags.cc
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) $(addprefix -include ,$(filter include/generated/%, \
@@ -139,6 +138,24 @@ build/%.d1: build/%.d %.c
 
 lib/unicode_width.c:
 	./scripts/gen-unicode_width_c.py >$@
+
+build/ctl/main/version.o \
+build/daemon/main/version.o: include/generated/worktree.h
+
+include/generated/worktree.h: build/.worktree-head build/.worktree-dirty
+	@mkdir -p $(@D)
+	printf '%s\n' $^ | \
+	./scripts/gen-headers.sh WORKTREE \
+				 -e s,^build/\\.worktree-,worktree/, >$@
+
+build/.worktree-head: .force
+	@mkdir -p $(@D)
+	@$(call mv_stale_c,git rev-parse HEAD,$@)
+
+build/.worktree-dirty: .force
+	@mkdir -p $(@D)
+	@$(call mv_stale_c,git diff HEAD --quiet || \
+			   git diff HEAD | git hash-object --stdin,$@)
 
 .force:
 

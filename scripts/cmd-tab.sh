@@ -28,7 +28,7 @@ int cmd${name:-_main}(int argc, const char **argv);
 $(sed $sed_cmd_name'extern const char *help'$name'_\1;|' .tmp-$$)
 
 #define CMD${class}_TABLE(v) \\
-	PA_OPT_GROUP(REPO_NAME " -${pretty:- main} commands:"), \\
+	PA_OPT_GROUP(BUILD_REPO_NAME " -${pretty:- main} commands:"), \\
 $(sed -e '$!'$sed_cmd_name"$opt_cmd_name"', \\|' \
       -e '$'$sed_cmd_name"$opt_cmd_name"'|' .tmp-$$)
 
