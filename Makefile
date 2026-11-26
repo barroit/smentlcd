@@ -9,7 +9,7 @@ endif
 
 MAKEFLAGS += -rR
 
-build/$(name): build/$(name)d build/$(name)ctl
+build/$(name): build/ctl/main/entry build/daemon/main/entry
 
 build_targets := build/.flags.% build/%.o include/%/cmdtab.h \
 		 build/%/entry build/$(name)% build/t/unit/% \
@@ -114,11 +114,15 @@ endif
 -include $(obj-lib_daemon:.o=.d1)
 -include $(obj-cmd:.o=.d1)
 
-build/$(name)d: build/daemon/main/entry
-	cp $< $@
+build/ctl/main/entry: | build/$(name)ctl
 
-build/$(name)ctl: build/ctl/main/entry
-	cp $< $@
+build/daemon/main/entry: | build/$(name)d
+
+build/$(name)ctl:
+	ln -s ctl/main/entry $@
+
+build/$(name)d:
+	ln -s daemon/main/entry $@
 
 $(obj-lib):
 
@@ -165,14 +169,6 @@ distclean:
 	rm -rf build include/config include/generated
 
 clean:
-	{ \
-		find build/lib build/daemon build/ctl \
-		     \( -name '*.o' -o -name '*.d' -o -name '*.d1' \
-			-o -name entry -o -name .cmdtree \
-			-o -name .cmdnode -o -name .cmdlist \) \
-		     -exec rm {} + ; \
-		find include/generated/daemon include/generated/ctl \
-		     -type f -exec rm {} + ; \
-		find daemon ctl -name '*_entry.c' -exec rm {} + ; \
-	} 2>/dev/null
-	rm -f build/$(name)
+	rm -rf build/lib build/systemd build/ctl build/daemon build/$(name)* \
+	       include/generated/ctl include/generated/daemon
+	find daemon ctl -name '*_entry.c' -exec rm -f {} +
