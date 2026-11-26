@@ -15,7 +15,7 @@ print(platform, end='\t')
 print(arch, end='\t')
 
 if kernel == 'Darwin':
-	info = platform.mac_ver()
+	info = mac_ver()
 
 	print(f"macOS {info[0]}")
 else:
