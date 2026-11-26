@@ -34,7 +34,7 @@ define mv_stale_c
 	$(call mv_stale_f,.tmp-$$$$,$(2),$(3),$(1))
 endef
 
-include mbuild/probe
+include mbuild/bootstrap
 include mbuild/kconfig
 
 ifneq ($(on_build),)
