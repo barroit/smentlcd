@@ -9,8 +9,6 @@ endif
 
 MAKEFLAGS += -rR
 
-build/$(name): build/ctl/main/entry build/daemon/main/entry
-
 build_targets := build/.flags.% build/%.o include/%/cmdtab.h \
 		 build/%/entry build/$(name)% build/t/unit/% \
 		 dev_% .dev_% install% uninstall% miku
@@ -33,6 +31,10 @@ define mv_stale_c
 	($(1)) >.tmp-$$$$; \
 	$(call mv_stale_f,.tmp-$$$$,$(2),$(3),$(1))
 endef
+
+build/$(name):
+
+.force:
 
 include mbuild/bootstrap
 include mbuild/kconfig
@@ -59,116 +61,16 @@ ifneq ($(on_build),)
 endif
 
 include mbuild/flags
+include mbuild/compile
+include mbuild/command
+include mbuild/executable
+
 include mbuild/install
 include mbuild/develop
 
-obj-lib += build/lib/atexit.o \
-	   build/lib/list.o \
-	   build/lib/log.o \
-	   build/lib/parse_argv.o \
-	   build/lib/rio.o \
-	   build/lib/sanitizer.o \
-	   build/lib/strbuf.o \
-	   build/lib/strlist.o \
-	   build/lib/strtox.o \
-	   build/lib/strutil.o \
-	   build/lib/unicode.o \
-	   build/lib/unicode_width.o \
-	   build/lib/xalloc.o
-
-obj-lib_ctl += build/lib/image.o \
-	       build/lib/packet.o
-
-obj-lib_daemon += build/lib/device.o \
-		  build/lib/log_nb.o \
-		  build/lib/playback.o
-
-ifeq ($(SERVICE),systemd)
-  obj-lib_ctl += build/lib/stbi.o \
-		 build/systemd/ipc_ctl.o
-
-  obj-lib_daemon += build/systemd/event.o \
-		    build/systemd/ipc_daemon.o \
-		    build/systemd/log_nb.o \
-		    build/systemd/pcheck.o
-endif
-
-ifeq ($(CC_HAS_REALLOCARRAY),)
-  obj-lib += build/lib/patch/reallocarray.o
-endif
-
-ifeq ($(CC_HAS_STRCHRNUL),)
-  obj-lib += build/lib/patch/strchrnul.o
-endif
-
-include mbuild/executable
-include mbuild/command
-
 ifneq ($(or $(print_db),$(CONFIG_ENABLE_TEST)),)
-  include mbuild/unitest
-  include mbuild/cmdtest
+  include mbuild/testunit
+  include mbuild/testcmd
 endif
 
--include $(obj-lib:.o=.d1)
--include $(obj-lib_ctl:.o=.d1)
--include $(obj-lib_daemon:.o=.d1)
--include $(obj-cmd:.o=.d1)
-
-build/ctl/main/entry: | build/$(name)ctl
-
-build/daemon/main/entry: | build/$(name)d
-
-build/$(name)ctl:
-	ln -s ctl/main/entry $@
-
-build/$(name)d:
-	ln -s daemon/main/entry $@
-
-$(obj-lib):
-
-build/%.o: %.c \
-	   include/generated/build.h \
-	   include/generated/features.h \
-	   build/.flags.cc
-	mkdir -p $(@D)
-	$(CC) $(CFLAGS) $(addprefix -include ,$(filter include/generated/%, \
-						       $^)) \
-	      -c $< -o $@
-
-build/%.d1: build/%.d %.c
-	@./scripts/fixconfig.sh $(shell grep .h: $< | tr -d : | \
-					sed s,include/generated/config.h,,) \
-				$*.c <$< >$@
-
-lib/unicode_width.c:
-	./scripts/gen-unicode_width_c.py >$@
-
-build/ctl/main/version.o \
-build/daemon/main/version.o: include/generated/worktree.h
-
-include/generated/worktree.h: build/.worktree-head build/.worktree-dirty
-	@mkdir -p $(@D)
-	printf '%s\n' $^ | \
-	./scripts/gen-headers.sh WORKTREE \
-				 -e s,^build/\\.worktree-,worktree/, >$@
-
-build/.worktree-head: .force
-	@mkdir -p $(@D)
-	@$(call mv_stale_c,git rev-parse HEAD,$@)
-
-build/.worktree-dirty: .force
-	@mkdir -p $(@D)
-	@$(call mv_stale_c,git diff HEAD --quiet || \
-			   git diff HEAD | git hash-object --stdin,$@)
-
-.force:
-
-.PHONY: clean distclean
-
-distclean:
-	rm -rf build include/config include/generated
-
-clean:
-	rm -rf build/lib build/systemd build/ctl build/daemon build/$(name)* \
-	       include/generated/ctl include/generated/daemon
-	find daemon ctl -name '*_entry.c' -exec rm -f {} +
+include mbuild/clean

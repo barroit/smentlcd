@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+.PHONY: clean distclean
+
+distclean:
+	rm -rf build include/config include/generated
+
+clean:
+	rm -rf build/lib build/systemd build/ctl build/daemon build/$(name)* \
+	       include/generated/ctl include/generated/daemon
+	find daemon ctl -name '*_entry.c' -exec rm -f {} +

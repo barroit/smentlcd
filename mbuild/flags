@@ -54,9 +54,8 @@ CFLAGS += -Wall \
 	  -Wpacked \
 	  -Wstrict-prototypes \
 	  -Wno-switch \
-	  -Wshadow
-
-CFLAGS += -Wno-parentheses
+	  -Wshadow \
+	  -Wno-parentheses
 
 CFLAGS += -iquote include
 

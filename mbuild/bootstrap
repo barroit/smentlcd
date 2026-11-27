@@ -23,24 +23,6 @@ bootstrap: build/probe/cc/program \
 build/.bootstrap:
 	$(error Missing bootstrap dependencies. Run 'make bootstrap' first)
 
-include/generated/build.h: build/probe/cc/id \
-			   build/probe/cc/version \
-			   build/probe/ld/id \
-			   build/probe/ld/version \
-			   build/probe/repo/name \
-			   build/probe/repo/version \
-			   build/probe/host/id \
-			   build/probe/host/arch \
-			   build/probe/host/name
-	mkdir -p $(@D)
-	printf '%s\n' $^ | \
-	./scripts/gen-headers.sh BUILD -e s,^build/probe/,build/, >$@
-
-include/generated/features.h: build/probe/cc/features \
-			      build/probe/ld/features
-	mkdir -p $(@D)
-	cat $^ | ./scripts/gen-features_h.sh >$@
-
 build/probe/repo/name:
 	mkdir -p $(@D)
 	printf '%s\n' $(name) >$@

@@ -1,0 +1,98 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+obj-lib += build/lib/atexit.o \
+	   build/lib/list.o \
+	   build/lib/log.o \
+	   build/lib/parse_argv.o \
+	   build/lib/rio.o \
+	   build/lib/sanitizer.o \
+	   build/lib/strbuf.o \
+	   build/lib/strlist.o \
+	   build/lib/strtox.o \
+	   build/lib/strutil.o \
+	   build/lib/unicode.o \
+	   build/lib/unicode_width.o \
+	   build/lib/xalloc.o
+
+obj-lib_ctl += build/lib/image.o \
+	       build/lib/packet.o
+
+obj-lib_daemon += build/lib/device.o \
+		  build/lib/log_nb.o \
+		  build/lib/playback.o
+
+ifeq ($(SERVICE),systemd)
+  obj-lib_ctl += build/lib/stbi.o \
+		 build/systemd/ipc_ctl.o
+
+  obj-lib_daemon += build/systemd/event.o \
+		    build/systemd/ipc_daemon.o \
+		    build/systemd/log_nb.o \
+		    build/systemd/pcheck.o
+endif
+
+ifeq ($(CC_HAS_REALLOCARRAY),)
+  obj-lib += build/lib/patch/reallocarray.o
+endif
+
+ifeq ($(CC_HAS_STRCHRNUL),)
+  obj-lib += build/lib/patch/strchrnul.o
+endif
+
+-include $(obj-lib:.o=.d1)
+-include $(obj-lib_ctl:.o=.d1)
+-include $(obj-lib_daemon:.o=.d1)
+-include $(obj-cmd:.o=.d1)
+
+build/ctl/main/version.o \
+build/daemon/main/version.o: include/generated/worktree.h
+
+lib/unicode_width.c:
+	./scripts/gen-unicode_width_c.py >$@
+
+build/%.o: %.c \
+	   include/generated/build.h \
+	   include/generated/features.h \
+	   build/.flags.cc
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) $(addprefix -include ,$(filter include/generated/%, \
+						       $^)) \
+	      -c $< -o $@
+
+build/%.d1: build/%.d %.c
+	@./scripts/fixconfig.sh $(shell grep .h: $< | tr -d : | \
+					sed s,include/generated/config.h,,) \
+				$*.c <$< >$@
+
+include/generated/build.h: build/probe/cc/id \
+			   build/probe/cc/version \
+			   build/probe/ld/id \
+			   build/probe/ld/version \
+			   build/probe/repo/name \
+			   build/probe/repo/version \
+			   build/probe/host/id \
+			   build/probe/host/arch \
+			   build/probe/host/name
+	mkdir -p $(@D)
+	printf '%s\n' $^ | \
+	./scripts/gen-headers.sh BUILD -e s,^build/probe/,build/, >$@
+
+include/generated/features.h: build/probe/cc/features \
+			      build/probe/ld/features
+	mkdir -p $(@D)
+	cat $^ | ./scripts/gen-features_h.sh >$@
+
+include/generated/worktree.h: build/.worktree-head build/.worktree-dirty
+	@mkdir -p $(@D)
+	printf '%s\n' $^ | \
+	./scripts/gen-headers.sh WORKTREE \
+				 -e s,^build/\\.worktree-,worktree/, >$@
+
+build/.worktree-head: .force
+	@mkdir -p $(@D)
+	@$(call mv_stale_c,git rev-parse HEAD,$@)
+
+build/.worktree-dirty: .force
+	@mkdir -p $(@D)
+	@$(call mv_stale_c,git diff HEAD --quiet || \
+			   git diff HEAD | git hash-object --stdin,$@)

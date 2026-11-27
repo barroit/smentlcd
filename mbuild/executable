@@ -1,5 +1,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+build/$(name): build/ctl/main/entry build/daemon/main/entry
+
+build/ctl/main/entry: | build/$(name)ctl
+
+build/daemon/main/entry: | build/$(name)d
+
+build/$(name)ctl:
+	ln -s ctl/main/entry $@
+
+build/$(name)d:
+	ln -s daemon/main/entry $@
+
 build/ctl/%/entry: build/.flags.ld \
 		   $(obj-lib) $(obj-lib_ctl) \
 		   build/libdeflate.a
