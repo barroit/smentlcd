@@ -9,21 +9,14 @@ uninstall: uninstall_$(SERVICE)
 .PHONY: install_systemd uninstall_systemd
 
 install_systemd: install_program
-	printf '%s' \
-	       'SUBSYSTEM=="usb", ' \
-	       'GROUP="smentlcd", ' \
-	       'MODE="0660", ' | \
-	sudo tee /etc/udev/rules.d/39-smentlcd.rules
-	printf 'ATTR{idVendor}=="%04x", ATTR{idProduct}=="%04x"\n' \
+	printf 'SUBSYSTEM=="usb", ATTR{idVendor}=="%04x", ATTR{idProduct}=="%04x", GROUP:="smentlcd", MODE:="0660"\n' \
 	       $(CONFIG_DEVICE_VID) $(CONFIG_DEVICE_PID) | \
-	sudo tee -a /etc/udev/rules.d/39-smentlcd.rules
+	sudo tee /etc/udev/rules.d/39-smentlcd.rules
 
 	sudo groupadd -f smentlcd
 	sudo udevadm control --reload-rules
 
 	mkdir -p $(HOME)/.config/systemd/user
-	rm -f $(HOME)/.config/systemd/user/smentlcd.service \
-	      $(HOME)/.config/systemd/user/smentlcd.socket
 	install -m $$(umask -S),a-x \
 		systemd/smentlcd.service systemd/smentlcd.socket \
 		$(HOME)/.config/systemd/user
