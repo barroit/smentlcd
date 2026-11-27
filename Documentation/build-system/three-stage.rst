@@ -9,19 +9,18 @@ This build system divides the entire build flow into 3 stages.
 Bootstrap
 =========
 
-Bootstrap probes the build environment. At this stage, the build system detects
-compiler metadata, linker metadata, repository specific constants, host
-information, and an available UTF-8 locale. It stores the detected information
-in dedicated files.
-
-``mbuild/probe`` provides the bootstrap target and defines corresponding
-targets.
+``make bootstrap`` records compiler and linker metadata, repository constants,
+host information, and the current UTF-8 locale, if any, under ``build/probe/``.
+``mbuild/bootstrap`` defines the probe rules. When the probes are complete, the
+target creates ``build/.bootstrap``, which configuration and building require.
 
 Toolchain Selection
 -------------------
 
-``scripts/probe-tools.sh`` selects the first compiler and linker pair that
-passes the following checks:
+``scripts/probe-tools.sh`` tries ``CC`` and ``LD`` first if both are set. On
+Darwin it next tries ``clang`` with ``ld64.lld``. On all hosts it then tries
+``gcc`` with ``ld.bfd``, followed by ``clang`` with ``ld.lld``. It selects the
+first pair that meets both requirements:
 
 - The compiler is GCC 12 or later, or Clang 18 or later.
 - The linker is BFD or LLD and can successfully link a test program using the
@@ -30,28 +29,30 @@ passes the following checks:
 Compiler / Linker Metadata
 --------------------------
 
-build/probe/{cc,ld}/program
-	The program's absolute path.
+``build/probe/{cc,ld}/program``
+	The program path found by the probe.
 
-build/probe/{cc,ld}/id
-	The program's ID.
+``build/probe/{cc,ld}/id``
+	The compiler ID (``gcc`` or ``clang``) or linker ID (``bfd`` or
+	``lld``).
 
-build/probe/{cc,ld}/version
-	The program's version.
+``build/probe/{cc,ld}/version``
+	The version encoded as ``major * 1000 + minor``.
 
-build/probe/{cc,ld}/name
+``build/probe/{cc,ld}/name``
 	The program's human readable name.
 
-build/probe/{cc,ld}/features
-	The program's available features, make(1) readable.
+``build/probe/{cc,ld}/features``
+	One ``NAME=y`` assignment per successful feature probe, readable by
+	make(1).
 
 These are probed by ``scripts/probe-cc*.sh`` and ``scripts/probe-ld*.sh``.
 
 Compiler Feature Detection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``scripts/probe-cc-features.sh`` defines the features to test. Tests come in two
-forms:
+``scripts/probe-cc-features.sh`` defines flag and program tests. A flag test
+compiles an empty source file with the specified flags:
 
 .. code-block:: shell
 
@@ -60,7 +61,7 @@ forms:
 	-g -gz=zlib
 	EOF
 
-Forms a flag-only test, and:
+A program test compiles the supplied source to assembly:
 
 .. code-block:: shell
 
@@ -73,18 +74,15 @@ Forms a flag-only test, and:
 	ssize_t a = 0;
 	EOF
 
-Forms a program test.
-
-The first line is the macro identifier. The second line contains the C compiler
-flags, separated by whitespace. It's required for flag-only tests but is
-optional for program tests. If the heredoc has no more lines, it becomes a
-flag-only test; otherwise, it's a program test.
+The first line is the macro identifier. The second line contains the compiler
+flags separated by whitespace. Omit this line for a program test that needs no
+flags. Both forms treat compiler warnings as errors.
 
 Linker Feature Detection
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-``scripts/probe-ld-features.sh`` defines the features to test. The test is
-formed in:
+``scripts/probe-ld-features.sh`` uses the selected compiler and linker to link a
+test object with the specified flags:
 
 .. code-block:: shell
 
@@ -98,13 +96,13 @@ Flags use the ``-Wl,<flag>`` format, separated by whitespace.
 Repository Specific Constants
 -----------------------------
 
-build/probe/repo/name
+``build/probe/repo/name``
 	The project's name.
 
-build/probe/repo/version
+``build/probe/repo/version``
 	The program's version.
 
-These constants are defined in the Makefile:
+The top-level ``Makefile`` defines those constants:
 
 .. code-block:: make
 
@@ -114,123 +112,140 @@ These constants are defined in the Makefile:
 Host Information
 ----------------
 
-build/probe/host/id
-	The host's ID.
+``build/probe/host/id``
+	The host's platform ID, such as ``linux`` or ``darwin``.
 
-build/probe/host/arch
+``build/probe/host/arch``
 	The host's architecture.
 
-build/probe/host/name
-	The host's human readable name.
+``build/probe/host/name``
+	The distribution's ``PRETTY_NAME`` on Linux or ``macOS`` followed by the
+	version on Darwin.
 
-These are obtained by python3.
+``scripts/probe-host.py`` obtains these values.
 
 UTF-8 Locale
 ------------
 
-build/probe/utf8/locale
-	The UTF-8 locale for LC_CTYPE.
+``build/probe/utf8/locale``
+	The current ``LC_CTYPE`` value if it uses UTF-8, or an empty file
+	otherwise.
 
-This acts as an LC_CTYPE fallback source for uc_force_utf8_ctype(), see
-:ref:`core-api/unicode:Locale Initialization`. It can be configured through
-Kconfig.
-
-Generated Headers
------------------
-
-The build system generates two headers from the bootstrap:
-
-include/generated/build.h
-	Contains repository constants and host information. Generated by
-	``scripts/gen-build_h.sh``.
-
-include/generated/features.h
-	Contains macros for the detected compiler and linker features. Generated
-	by ``scripts/gen-features_h.sh``.
-
-These headers are generated when required by the building stage, rather than
-by the bootstrap target itself.
+This value supplies the Kconfig default for ``CONFIG_UTF8_LOCALE``, which
+``uc_force_utf8_ctype()`` uses as a fallback. See
+:ref:`core-api/unicode:Locale Initialization`.
 
 Configuration
 =============
 
-At this stage, the build system runs Kconfig to generate build configurations.
+Kconfig reads the bootstrap results to set configuration defaults and determine
+which compiler and linker options are available.
 
 Configuration Targets
 ---------------------
 
 ``mbuild/kconfig`` defines the ``alldefconfig`` and ``menuconfig`` targets.
 
-Both configuration targets depend on bootstrap. Configuration must be generated
-before entering the building stage.
+Both configuration targets require ``build/.bootstrap``.
 
-alldefconfig
-	This target generates the config file with default values. These values
-	are ready for a release build.
+``alldefconfig``
+	Generate the configuration file with default values for a release build.
 
-menuconfig
-	This target starts the TUI menu for changing the configuration.
+``menuconfig``
+	Open the configuration menu. On exit, generate the build configuration
+	files if ``build/.config`` exists.
 
 Configuration Files
 -------------------
 
-These targets produce the following files:
+Kconfig produces the following configuration and dependency files:
 
-- build/.config
+- ``build/.config``
 	The Kconfig state file.
 
-- include/config/auto.conf
+- ``include/config/auto.conf``
 	The config file in a format readable by make(1).
 
-- include/config/\*.h
-	The dependency files used in incremental build.
+- ``include/config/**/*.h``
+	Per-option dependency headers for incremental builds. See
+	:ref:`build-system/incremental-build:Configuration Dependencies`.
 
-- include/generated/config.h
+- ``include/generated/config.h``
 	The header file that contains the config dump. It's injected into the
 	source file via ``-include include/generated/config.h``.
 
-Menu entries are defined in ``kconfig/*``.
+The top-level ``Kconfig`` reads ``kconfig/compile`` and ``kconfig/runtime``.
 
 Building
 ========
 
-This stage is activated for build, development, and installation targets.
+Compilation, linking, development, and installation targets activate this stage.
+The building stage requires a generated configuration.
 
-The build system loads the probed compiler and linker features, Kconfig
-generated ``auto.conf``, and the daemon and controller command trees. These
-inputs determine the compilation and linking flags, object selection, and
-platform specific dependencies.
+The build system reads the probed compiler and linker features,
+``include/config/auto.conf``, and the generated command trees in
+``build/daemon/.cmdtree`` and ``build/ctl/.cmdtree``. These inputs determine the
+compilation and linking flags and object selection. See :doc:`build-graph` and
+:doc:`command-generation`.
+
+``mbuild/flags`` sets the compiler and linker flags. If ``CONFIG_EMBED_CONFIG``
+is enabled, the linker embeds ``build/.config`` in ELF or Mach-O executables.
+With ``CONFIG_ENABLE_TEST`` enabled, the build includes ``mbuild/testunit`` and
+``mbuild/testcmd``. See :doc:`../test/index`.
+
+Generated Headers
+-----------------
+
+``mbuild/compile`` defines the object compilation rules and generates two
+headers from the bootstrap results:
+
+``include/generated/build.h``
+	Contains compiler and linker IDs and versions, repository constants, and
+	host information. Generated by ``scripts/gen-headers.sh``.
+
+``include/generated/features.h``
+	Contains macros for the detected compiler and linker features. Generated
+	by ``scripts/gen-features_h.sh``.
 
 Executable Targets
 ------------------
 
-- build/smentlcdd
-	Build the daemon executable.
+``mbuild/executable`` defines the entry executable and symbolic link targets:
 
-- build/smentlcdctl
-	Build the controller executable.
+- ``build/smentlcdd``
+	Create a symbolic link to the daemon executable at
+	``build/daemon/main/entry``.
 
-- build/smentlcd
-	Build both executables. This is the default target when make(1) is
-	invoked without any target.
+- ``build/smentlcdctl``
+	Create a symbolic link to the controller executable at
+	``build/ctl/main/entry``.
+
+- ``build/smentlcd``
+	Build both entry executables and create their symbolic links. This is
+	the default target when make(1) is invoked without a target.
 
 Development Targets
 -------------------
 
-- dev_setup_unit
-	Set up and start the daemon service.
+- ``dev_setup_unit``
+	Set up and start the daemon service for the current user.
 
-- dev_teardown_unit
-	Stop and tear down the daemon service.
+- ``dev_teardown_unit``
+	Stop and disable the daemon service for the current user.
 
-- dev_monitor
-	Show and follow the daemon logs.
+- ``dev_monitor``
+	Follow the daemon logs.
+
+- ``dev_link_program``
+	Build both executables and link them into ``$HOME/.local/bin``.
 
 Installation Targets
 --------------------
 
-- install
-	Install the program and platform integration.
+- ``install``
+	Install the program and its platform integration.
 
-- uninstall
-	Uninstall the program and platform integration.
+- ``uninstall``
+	Remove the program and its platform integration.
+
+See :doc:`../user-manual/install`.
